@@ -1,0 +1,6 @@
+MainPackage=E:\__BuildSource\__SVN__\OneTouchMonitor\bin\ARM64\Release\OneTouchMonitor_1.0.8.0_ARM64.msix
+ResourcePack=E:\__BuildSource\__SVN__\OneTouchMonitor\bin\ARM64\Release\OneTouchMonitor_1.0.8.0_language-en.msix
+ResourcePack=E:\__BuildSource\__SVN__\OneTouchMonitor\bin\ARM64\Release\OneTouchMonitor_1.0.8.0_scale-100.msix
+ResourcePack=E:\__BuildSource\__SVN__\OneTouchMonitor\bin\ARM64\Release\OneTouchMonitor_1.0.8.0_scale-125.msix
+ResourcePack=E:\__BuildSource\__SVN__\OneTouchMonitor\bin\ARM64\Release\OneTouchMonitor_1.0.8.0_scale-150.msix
+ResourcePack=E:\__BuildSource\__SVN__\OneTouchMonitor\bin\ARM64\Release\OneTouchMonitor_1.0.8.0_scale-400.msix

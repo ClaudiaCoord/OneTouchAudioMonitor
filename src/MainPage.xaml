@@ -1,0 +1,285 @@
+﻿<Page
+    x:Class="OneTouchMonitor.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:OneTouchMonitor"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <local:IndicateIconForeground x:Key="IconForeground" />
+    </Page.Resources>
+
+    <Grid Background="#FF272727">
+        <StackPanel
+            x:Name="rootPanel"
+            Width="340"
+            HorizontalAlignment="Left"
+            Orientation="Vertical">
+
+            <StackPanel
+                Width="{Binding ActualWidth, ElementName=rootPanel, FallbackValue=340, Mode=OneWay}"
+                Margin="4,10,0,4"
+                HorizontalAlignment="Left"
+                Orientation="Horizontal"
+                Style="{StaticResource BoxPanel}">
+
+                <Button
+                    Width="50"
+                    Margin="0,0,4,0"
+                    Background="Transparent"
+                    Click="Button_ClickMinimize"
+                    Content="&#xEC52;"
+                    Foreground="#FFF7F3F3"
+                    Style="{StaticResource ButtonIcon}" />
+
+                <Button
+                    Margin="0,0,4,0"
+                    Background="Transparent"
+                    Click="Button_ClickReset"
+                    Content="&#xED10;"
+                    Foreground="White"
+                    Style="{StaticResource ButtonIcon}" />
+
+                <Button
+                    Background="Transparent"
+                    Click="Button_ClickExit"
+                    Content="&#xF3B1;"
+                    Foreground="White"
+                    Style="{StaticResource ButtonIcon}" />
+            </StackPanel>
+
+            <StackPanel
+                Width="{Binding ActualWidth, ElementName=rootPanel, FallbackValue=340, Mode=OneWay}"
+                HorizontalAlignment="Left"
+                Orientation="Horizontal"
+                Style="{StaticResource BoxPanel}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40" />
+                        <ColumnDefinition Width="40" />
+                        <ColumnDefinition Width="80" />
+                        <ColumnDefinition Width="160" />
+                    </Grid.ColumnDefinitions>
+                    <Slider
+                        Grid.Row="0"
+                        Grid.RowSpan="2"
+                        Grid.Column="0"
+                        Height="200"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Maximum="9.0"
+                        Minimum="0.0"
+                        Orientation="Vertical"
+                        StepFrequency="0.1"
+                        TickFrequency="0.5"
+                        TickPlacement="Outside"
+                        Value="{Binding Path=Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <StackPanel
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Margin="0,20,0,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        Orientation="Vertical"
+                        Style="{StaticResource BoxPanel}">
+                        <FontIcon
+                            Foreground="{Binding Path=IsAudioInDevice, Mode=OneWay, Converter={StaticResource IconForeground}, ConverterParameter=LightGreen}"
+                            Glyph="&#xF12E;"
+                            Style="{StaticResource IndicateIcon}" />
+                        <FontIcon
+                            Foreground="{Binding Path=IsBtOutEnable, Mode=OneWay, Converter={StaticResource IconForeground}, ConverterParameter=DodgerBlue}"
+                            Glyph="&#xE702;"
+                            Style="{StaticResource IndicateIcon}" />
+                        <FontIcon
+                            Foreground="{Binding Path=IsAudioOutEnable, Mode=OneWay, Converter={StaticResource IconForeground}, ConverterParameter=YellowGreen}"
+                            Glyph="&#xED1F;"
+                            Style="{StaticResource IndicateIcon}" />
+                        <FontIcon
+                            Foreground="{Binding Path=IsPlayStatus, Mode=OneWay, Converter={StaticResource IconForeground}, ConverterParameter=Green}"
+                            Glyph="&#xEDB5;"
+                            Style="{StaticResource IndicateIcon}" />
+                        <FontIcon
+                            Foreground="{Binding Path=IsInitStatus, Mode=OneWay, Converter={StaticResource IconForeground}, ConverterParameter=OrangeRed}"
+                            Glyph="&#xE81D;"
+                            Style="{StaticResource IndicateIcon}" />
+                        <FontIcon
+                            Foreground="{Binding Path=IsWarning, Mode=OneWay, Converter={StaticResource IconForeground}, ConverterParameter=Red}"
+                            Glyph="&#xEB56;"
+                            Style="{StaticResource IndicateIcon}" />
+                    </StackPanel>
+
+                    <StackPanel
+                        Grid.Row="0"
+                        Grid.Column="2"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        Orientation="Vertical"
+                        Style="{StaticResource BoxPanel}">
+
+                        <ToggleButton
+                            Margin="5"
+                            Content="&#xEC41;"
+                            FontFamily="Segoe MDL2 Assets"
+                            IsChecked="{Binding Path=IsBTOn, FallbackValue=false, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            IsEnabled="{Binding Path=IsBTAutoEnable, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            Style="{StaticResource ToggleButtonStyleBT}" />
+
+                        <ToggleButton
+                            Margin="5"
+                            Content="&#xF0EB;"
+                            FontFamily="Segoe MDL2 Assets"
+                            IsChecked="{Binding Path=IsAudioOn, FallbackValue=false, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            IsEnabled="{Binding Path=IsAudioAutoEnable, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            Style="{StaticResource ToggleButtonStyleAudio}" />
+
+                        <Button
+                            Margin="5"
+                            Background="Orange"
+                            Click="Button_ClickSetup"
+                            Content="&#xE835;"
+                            Foreground="Black"
+                            IsEnabled="{Binding Path=IsCallSettings, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            Style="{StaticResource ButtonIcon}" />
+                    </StackPanel>
+
+                    <StackPanel
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        Orientation="Vertical"
+                        Style="{StaticResource BoxPanel}">
+
+                        <Button
+                            Width="50"
+                            Margin="5"
+                            Background="#FF08A608"
+                            Click="Button_ClickPlay"
+                            Content="&#xF5B0;"
+                            Foreground="White"
+                            IsEnabled="{Binding Path=IsPlay, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            Style="{StaticResource ButtonIcon}" />
+
+                        <Button
+                            Width="50"
+                            Margin="5"
+                            Background="#FF871105"
+                            Click="Button_ClickStop"
+                            Content="&#xF8AE;"
+                            Foreground="#FFDACCCC"
+                            IsEnabled="{Binding Path=IsStop, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            Style="{StaticResource ButtonIcon}" />
+                    </StackPanel>
+
+                    <StackPanel
+                        Grid.Row="0"
+                        Grid.RowSpan="2"
+                        Grid.Column="3"
+                        Orientation="Vertical"
+                        Style="{StaticResource BoxPanel}">
+
+                        <StackPanel
+                            Margin="0,20,0,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Top"
+                            Orientation="Horizontal">
+                            <Slider
+                                Height="200"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Maximum="7.94"
+                                Minimum="0.126"
+                                Orientation="Vertical"
+                                StepFrequency="0.1"
+                                TickFrequency="0.5"
+                                TickPlacement="Outside"
+                                Value="{Binding Path=AudioEq1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Slider
+                                Height="200"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Maximum="7.94"
+                                Minimum="0.126"
+                                Orientation="Vertical"
+                                StepFrequency="0.1"
+                                TickFrequency="0.5"
+                                TickPlacement="Outside"
+                                Value="{Binding Path=AudioEq2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Slider
+                                Height="200"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Maximum="7.94"
+                                Minimum="0.126"
+                                Orientation="Vertical"
+                                StepFrequency="0.1"
+                                TickFrequency="0.5"
+                                TickPlacement="Outside"
+                                Value="{Binding Path=AudioEq3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Slider
+                                Height="200"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Maximum="7.94"
+                                Minimum="0.126"
+                                Orientation="Vertical"
+                                StepFrequency="0.1"
+                                TickFrequency="0.5"
+                                TickPlacement="Outside"
+                                Value="{Binding Path=AudioEq4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                        <StackPanel
+                            Margin="5,10,0,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Top"
+                            Orientation="Horizontal">
+                            <ToggleSwitch
+                                Width="140"
+                                OffContent="Off"
+                                OnContent="On"
+                                IsOn="{Binding IsEqEnable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                    </StackPanel>
+
+
+                </Grid>
+            </StackPanel>
+
+            <StackPanel
+                Width="{Binding ActualWidth, ElementName=rootPanel, FallbackValue=340, Mode=OneWay}"
+                HorizontalAlignment="Left"
+                Orientation="Horizontal"
+                Style="{StaticResource BoxPanel}">
+                <StackPanel.Resources>
+                    <Storyboard x:Name="Storyboard1">
+                        <DoubleAnimation
+                            RepeatBehavior="Forever"
+                            Storyboard.TargetName="blockLog"
+                            Storyboard.TargetProperty="(Canvas.Left)"
+                            From="340"
+                            To="-500"
+                            Duration="0:0:10" />
+                    </Storyboard>
+                </StackPanel.Resources>
+                <Canvas Width="340" Height="20">
+                    <Canvas.Clip>
+                        <RectangleGeometry Rect="0, 0, 340, 100" />
+                    </Canvas.Clip>
+                    <TextBlock
+                        Name="blockLog"
+                        MinWidth="340"
+                        MinHeight="18"
+                        FontSize="11"
+                        Text="{Binding Path=LogString, Mode=OneWay}"
+                        TextWrapping="Wrap" />
+                </Canvas>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Page>

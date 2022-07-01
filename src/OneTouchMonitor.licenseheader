@@ -1,0 +1,20 @@
+﻿extensions: .cs
+/*
+ * Git: https://github.com/ClaudiaCoord/OneTouchAudioMonitor
+ * Copyright (c) 2022 СС
+ * License MIT.
+*/
+extensions: .cpp .h
+// Copyright (c) 2022 СС
+extensions: .aspx .ascx
+<%-- 
+Git: https://github.com/ClaudiaCoord/OneTouchAudioMonitor
+Copyright (c) 2022 СС
+License MIT.
+--%>
+extensions: .config .xsd
+<!--
+Git: https://github.com/ClaudiaCoord/OneTouchAudioMonitor
+Copyright (c) 2022 СС
+License MIT.
+-->

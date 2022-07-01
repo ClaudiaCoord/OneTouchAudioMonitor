@@ -1,0 +1,99 @@
+﻿<Page
+    x:Class="OneTouchMonitor.SettingPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:OneTouchMonitor"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <Style x:Key="BoxList" TargetType="ComboBox">
+            <Setter Property="Width" Value="300" />
+            <Setter Property="Margin" Value="0,10,0,0" />
+            <Setter Property="DisplayMemberPath" Value="Name" />
+            <Setter Property="SelectedValuePath" Value="Name" />
+        </Style>
+    </Page.Resources>
+    
+    <Grid
+        MinWidth="340"
+        Background="#FF272727">
+        <StackPanel
+            x:Name="rootPanel"
+            Orientation="Vertical">
+            <StackPanel
+                Width="{Binding ActualWidth, ElementName=rootPanel, FallbackValue=340, Mode=OneWay}"
+                Margin="4,10,0,4"
+                HorizontalAlignment="Left"
+                Orientation="Horizontal"
+                Style="{StaticResource BoxPanel}">
+
+                <Button
+                    Width="50"
+                    Margin="0,0,4,0"
+                    Background="Transparent"
+                    Click="Button_ClickReturn"
+                    Content="&#xEC52;"
+                    Foreground="#FFF7F3F3"
+                    Style="{StaticResource ButtonIcon}" />
+
+                <Button
+                    Margin="0,0,4,0"
+                    Background="Transparent"
+                    Click="Button_ClickSave"
+                    Content="&#xE792;"
+                    Foreground="White"
+                    Style="{StaticResource ButtonIcon}" />
+
+                <Button
+                    Background="Transparent"
+                    Click="Button_ClickErase"
+                    Content="&#xED60;"
+                    Foreground="White"
+                    Style="{StaticResource ButtonIcon}" />
+            </StackPanel>
+
+            <StackPanel
+                Width="{Binding ActualWidth, ElementName=rootPanel, FallbackValue=340, Mode=OneWay}"
+                Padding="10"
+                HorizontalAlignment="Left"
+                Orientation="Vertical"
+                Style="{StaticResource BoxPanel}">
+                <ComboBox
+                    Style="{StaticResource BoxList}"
+                    Header="Audio In"
+                    PlaceholderText="Select device .."
+                    ItemsSource="{Binding ListAudioIn, Mode=OneWay}"
+                    SelectedItem="{Binding ItemAudioIn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Loaded="ComboAudioIn_Loaded" />
+                <ComboBox
+                    Style="{StaticResource BoxList}"
+                    Header="Audio Out"
+                    PlaceholderText="Select device .."
+                    ItemsSource="{Binding ListAudioOut, Mode=OneWay}"
+                    SelectedItem="{Binding ItemAudioOut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Loaded="ComboAudioOut_Loaded" />
+                <ComboBox
+                    Style="{StaticResource BoxList}"
+                    Header="BT Out"
+                    PlaceholderText="Select device .."
+                    ItemsSource="{Binding ListBtOut, Mode=OneWay}"
+                    SelectedItem="{Binding ItemBtOut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Loaded="ComboBtOut_Loaded" />
+            </StackPanel>
+            <StackPanel
+                Width="{Binding ActualWidth, ElementName=rootPanel, FallbackValue=340, Mode=OneWay}"
+                Padding="10"
+                HorizontalAlignment="Left"
+                Orientation="Vertical"
+                Style="{StaticResource BoxPanel}">
+                <ToggleSwitch
+                    Header="Theme select"
+                    OffContent="Light"
+                    OnContent="Dark"
+                    IsOn="{Binding ThemeSelector, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Page>
