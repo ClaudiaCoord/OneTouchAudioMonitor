@@ -6,6 +6,9 @@
 
 # OneTouch Audio Input Monitor (UWP)
 
+One Touch Audio Monitor is designed to quickly switch input audio devices to selected output audio devices with one touch. For example, it is relevant for quickly listening to a microphone, usually on headphones connected both with a wire and with a Bluetooth connection.  
+Supports all kinds of audio input and output devices, including Bluetooth devices.  
+
 ![OneTouch Audio Monitor](https://claudiacoord.github.io/OneTouchAudioMonitor/img1.png) 
 
 ### Installation:
