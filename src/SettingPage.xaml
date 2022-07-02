@@ -15,13 +15,9 @@
             <Setter Property="SelectedValuePath" Value="Name" />
         </Style>
     </Page.Resources>
-    
-    <Grid
-        MinWidth="340"
-        Background="#FF272727">
-        <StackPanel
-            x:Name="rootPanel"
-            Orientation="Vertical">
+
+    <Grid MinWidth="340" Background="#FF272727">
+        <StackPanel x:Name="rootPanel" Orientation="Vertical">
             <StackPanel
                 Width="{Binding ActualWidth, ElementName=rootPanel, FallbackValue=340, Mode=OneWay}"
                 Margin="4,10,0,4"
@@ -61,38 +57,32 @@
                 Orientation="Vertical"
                 Style="{StaticResource BoxPanel}">
                 <ComboBox
-                    Style="{StaticResource BoxList}"
-                    Header="Audio In"
-                    PlaceholderText="Select device .."
+                    x:Uid="GUI1"
                     ItemsSource="{Binding ListAudioIn, Mode=OneWay}"
+                    Loaded="ComboAudioIn_Loaded"
                     SelectedItem="{Binding ItemAudioIn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    Loaded="ComboAudioIn_Loaded" />
+                    Style="{StaticResource BoxList}" />
                 <ComboBox
-                    Style="{StaticResource BoxList}"
-                    Header="Audio Out"
-                    PlaceholderText="Select device .."
+                    x:Uid="GUI2"
                     ItemsSource="{Binding ListAudioOut, Mode=OneWay}"
+                    Loaded="ComboAudioOut_Loaded"
                     SelectedItem="{Binding ItemAudioOut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    Loaded="ComboAudioOut_Loaded" />
+                    Style="{StaticResource BoxList}" />
                 <ComboBox
-                    Style="{StaticResource BoxList}"
-                    Header="BT Out"
-                    PlaceholderText="Select device .."
+                    x:Uid="GUI3"
                     ItemsSource="{Binding ListBtOut, Mode=OneWay}"
+                    Loaded="ComboBtOut_Loaded"
                     SelectedItem="{Binding ItemBtOut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    Loaded="ComboBtOut_Loaded" />
+                    Style="{StaticResource BoxList}" />
             </StackPanel>
             <StackPanel
                 Width="{Binding ActualWidth, ElementName=rootPanel, FallbackValue=340, Mode=OneWay}"
                 Padding="10"
                 HorizontalAlignment="Left"
-                Orientation="Vertical"
+                Orientation="Horizontal"
                 Style="{StaticResource BoxPanel}">
-                <ToggleSwitch
-                    Header="Theme select"
-                    OffContent="Light"
-                    OnContent="Dark"
-                    IsOn="{Binding ThemeSelector, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <ToggleSwitch x:Uid="GUI4" IsOn="{Binding ThemeSelector, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <ToggleSwitch x:Uid="GUI6" IsOn="{Binding IsSound, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </StackPanel>
         </StackPanel>
     </Grid>

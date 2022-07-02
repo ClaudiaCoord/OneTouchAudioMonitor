@@ -126,6 +126,48 @@
   <data name="FMT4" xml:space="preserve">
     <value>BT Device: {0} -&gt; Stop</value>
   </data>
+  <data name="GUI1.Header" xml:space="preserve">
+    <value>Audio In</value>
+  </data>
+  <data name="GUI1.PlaceholderText" xml:space="preserve">
+    <value>Select device ..</value>
+  </data>
+  <data name="GUI2.Header" xml:space="preserve">
+    <value>Audio Out</value>
+  </data>
+  <data name="GUI2.PlaceholderText" xml:space="preserve">
+    <value>Select device ..</value>
+  </data>
+  <data name="GUI3.Header" xml:space="preserve">
+    <value>BT Out</value>
+  </data>
+  <data name="GUI3.PlaceholderText" xml:space="preserve">
+    <value>Select device ..</value>
+  </data>
+  <data name="GUI4.Header" xml:space="preserve">
+    <value>Theme select</value>
+  </data>
+  <data name="GUI4.OffContent" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="GUI4.OnContent" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="GUI5.OffContent" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="GUI5.OnContent" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="GUI6.Header" xml:space="preserve">
+    <value>Sound</value>
+  </data>
+  <data name="GUI6.OffContent" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="GUI6.OnContent" xml:space="preserve">
+    <value>On</value>
+  </data>
   <data name="S1" xml:space="preserve">
     <value>Cannot stop playback, busy with another process</value>
   </data>
@@ -149,5 +191,11 @@
   </data>
   <data name="S8" xml:space="preserve">
     <value>Input device not found..</value>
+  </data>
+  <data name="TITLE1" xml:space="preserve">
+    <value>Audio Monitor</value>
+  </data>
+  <data name="TITLE2" xml:space="preserve">
+    <value>Audio Settings</value>
   </data>
 </root>

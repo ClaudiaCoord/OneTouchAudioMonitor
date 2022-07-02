@@ -2,7 +2,8 @@
  * Git: https://github.com/ClaudiaCoord/OneTouchAudioMonitor
  * Copyright (c) 2022 СС
  * License MIT.
-*/
+ */
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,6 +14,7 @@ using System.Threading.Tasks;
 using OneTouchMonitor.Data;
 using OneTouchMonitor.Event;
 using Windows.Foundation;
+using Windows.Media;
 using Windows.System;
 using Windows.System.Threading;
 using Windows.UI.Core;
@@ -26,7 +28,7 @@ namespace OneTouchMonitor
     public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
         public static Size Size = new Size(340, 400);
-        public static string Title = "Audio Monitor";
+        public static string Title => Config.GetString("TITLE1");
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string name = "") =>
@@ -40,6 +42,7 @@ namespace OneTouchMonitor
                      isAudioOn = false;
         private string logString = string.Empty;
         private ThreadPoolTimer LazyTimer = default;
+        private SystemMediaTransportControls mediaCtrl = default;
 
         public MainPage() {
             this.InitializeComponent();
@@ -156,7 +159,7 @@ namespace OneTouchMonitor
             BtPropertyChanged();
             AudioPropertyChanged();
 #           if DEBUG_PropertyChanged
-            _ = ToString();
+            Debug.WriteLine(ToString());
 #           endif
         }
 
@@ -203,6 +206,7 @@ namespace OneTouchMonitor
 
         #endregion
 
+        #region LazyStartScan
         private void LazyStartScan(AudioSelectorType at) {
             if (IsStop || (LazyTimer != default)) return;
             LazyTimer = ThreadPoolTimer.CreateTimer(
@@ -216,31 +220,88 @@ namespace OneTouchMonitor
                         });
                 }, TimeSpan.FromSeconds(5));
         }
+        #endregion
 
-        private async void LogCb(object obj, Events.LogEventArgs args) =>
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => LogString = args.Message);
-
+        #region OnNavigatedTo / OnNavigatedFrom
         protected override void OnNavigatedTo(NavigationEventArgs e) {
+            RequestedTheme = Config.Instance.EleTheme;
+            mediaCtrl = SystemMediaTransportControls.GetForCurrentView();
+
             Config.Instance.PropertyChanged += InPropertyChanged;
             Config.BtDevices.EventCb += BtDevices_EventCb;
             Config.AudioOutDevices.EventCb += AudioDevices_EventCb;
             Config.BtDevices.LogCb += LogCb;
             Config.AudioOutDevices.LogCb += LogCb;
             Config.AudioCapture.LogCb += LogCb;
+
             OnPropertyChanged(nameof(Volume));
             if (IsOldBtStatus) IsBTOn = true;
             else if (IsOldPlayStatus) IsAudioOn = true;
+
+            Window.Current.CoreWindow.KeyDown += CoreWindow_KeyDown;
+
+            if (mediaCtrl != default) {
+                mediaCtrl.IsPlayEnabled = true;
+                mediaCtrl.IsStopEnabled = true;
+                mediaCtrl.IsPauseEnabled = true;
+                mediaCtrl.ButtonPressed += TransportCtrl_ButtonPressed;
+            }
+            if (Config.Instance.IsSound) {
+                ElementSoundPlayer.State = ElementSoundPlayerState.On;
+                ElementSoundPlayer.SpatialAudioMode = ElementSpatialAudioMode.On;
+            } else {
+                ElementSoundPlayer.State = ElementSoundPlayerState.Off;
+            }
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e) {
             IsOldPlayStatus = IsPlayStatus;
             IsOldBtStatus = IsBtOutEnable;
+            Window.Current.CoreWindow.KeyDown -= CoreWindow_KeyDown;
+            if (mediaCtrl != default)
+                mediaCtrl.ButtonPressed -= TransportCtrl_ButtonPressed;
             Config.Instance.PropertyChanged -= InPropertyChanged;
             Config.BtDevices.EventCb -= BtDevices_EventCb;
             Config.AudioOutDevices.EventCb -= AudioDevices_EventCb;
             Config.BtDevices.LogCb -= LogCb;
             Config.AudioOutDevices.LogCb -= LogCb;
             Config.AudioCapture.LogCb -= LogCb;
+            mediaCtrl = default;
+        }
+        #endregion
+
+        private async void LogCb(object obj, Events.LogEventArgs args) =>
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => LogString = args.Message);
+
+        private void TransportCtrl_ButtonPressed(SystemMediaTransportControls s, SystemMediaTransportControlsButtonPressedEventArgs a) {
+            if (a.Button.HasFlag(SystemMediaTransportControlsButton.Play)) {
+                if (IsPlay) ClickPlay();
+                else if (IsStop) ClickStop();
+            }
+            else if ((a.Button.HasFlag(SystemMediaTransportControlsButton.Pause) ||
+                 a.Button.HasFlag(SystemMediaTransportControlsButton.Stop)) && IsStop)
+                ClickStop();
+        }
+
+        private void CoreWindow_KeyDown(CoreWindow s, KeyEventArgs a) {
+            if (((a.VirtualKey == VirtualKey.Stop) || (a.VirtualKey == VirtualKey.Pause)) && IsStop)
+                ClickStop();
+            else if ((int)a.VirtualKey == 179) {
+                if (IsStop)
+                    ClickStop();
+                else if (IsPlay)
+                    ClickPlay();
+            }
+            else if (a.VirtualKey == VirtualKey.F2) {
+                if (IsBTOn) IsBTOn = false;
+                else if (!IsBTOn && !IsAudioOn) IsBTOn = true;
+            }
+            else if (a.VirtualKey == VirtualKey.F3) {
+                if (IsAudioOn) IsAudioOn = false;
+                else if (!IsAudioOn && !IsBTOn) IsAudioOn = true;
+            }
+            else if ((a.VirtualKey == VirtualKey.F4) && IsCallSettings)
+                ClickSetup();
         }
 
         private async void Button_ClickMinimize(object sender, RoutedEventArgs e) {
@@ -255,10 +316,16 @@ namespace OneTouchMonitor
         private async void Button_ClickPlay(object sender, RoutedEventArgs _) =>
             await Config.AudioCapture.Start().ConfigureAwait(false);
 
-        private void Button_ClickStop(object sender, RoutedEventArgs _) {
-            LogString = string.Empty;
-            Config.AudioCapture.Stop();
+        private async void Button_ClickStop(object sender, RoutedEventArgs _) {
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                LogString = string.Empty;
+                Config.AudioCapture.Stop();
+            });
         }
+
+        private void ClickPlay() => Button_ClickPlay(null, null);
+        private void ClickStop() => Button_ClickStop(null, null);
+        private void ClickSetup() => Button_ClickSetup(null, null);
 
         private async void Button_ClickReset(object sender, RoutedEventArgs __) =>
             _ = await ClickReset().ConfigureAwait(false);
@@ -273,13 +340,7 @@ namespace OneTouchMonitor
         private void Button_ClickSetup(object sender, RoutedEventArgs e) =>
             ((App)App.Current).OnNavigatedTo(AppPageType.MainSetup);
 
-        private void SpatialChecked(object sender, RoutedEventArgs e) {
-            if (sender is CheckBox cb) {
-                ElementSoundPlayer.State = ElementSoundPlayerState.On;
-                ElementSoundPlayer.SpatialAudioMode = (bool)cb.IsChecked ? ElementSpatialAudioMode.On : ElementSpatialAudioMode.Off;
-            }
-        }
-
+        #region ToString
 #       if DEBUG
         public override string ToString()
         {
@@ -313,10 +374,9 @@ namespace OneTouchMonitor
             sb.AppendLine($"\t + Config.AudioOutSelectedDevices.IsOutDevices = {Config.AudioOutDevices.IsOutDevices}");
             sb.AppendLine($"\t + Config.AudioOutSelectedDevices.IsFoundDevices = {Config.AudioOutDevices.IsFoundDevices}");
             sb.AppendLine($"\t + Config.AudioOutSelectedDevices.IsConnectedDevices = {Config.AudioOutDevices.IsConnectedDevices}");
-            string s = sb.ToString();
-            Debug.WriteLine(s);
-            return s;
+            return sb.ToString();
         }
 #       endif
+        #endregion
     }
 }

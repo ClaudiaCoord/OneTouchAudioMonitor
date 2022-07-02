@@ -2,7 +2,8 @@
  * Git: https://github.com/ClaudiaCoord/OneTouchAudioMonitor
  * Copyright (c) 2022 СС
  * License MIT.
-*/
+ */
+
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace OneTouchMonitor
     public sealed partial class SettingPage : Page, INotifyPropertyChanged
     {
         public static Size Size = new Size(340, 400);
-        public static string Title = "Audio Settings";
+        public static string Title => Config.GetString("TITLE2");
 
         public ObservableCollection<AudioDevice> ListAudioIn { get; } = new();
         public ObservableCollection<AudioDevice> ListAudioOut { get; } = new();
@@ -58,10 +59,18 @@ namespace OneTouchMonitor
             get => Config.Instance.Theme == ApplicationTheme.Dark;
             set {
                 Config.Instance.Theme = value ? ApplicationTheme.Dark : ApplicationTheme.Light;
+                RequestedTheme = Config.Instance.EleTheme;
                 OnPropertyChanged();
             }
         }
-
+        public bool IsSound {
+            get => Config.Instance.IsSound;
+            set {
+                Config.Instance.IsSound = value;
+                OnPropertyChanged();
+            }
+        }
+        
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string name = "") =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
@@ -77,6 +86,8 @@ namespace OneTouchMonitor
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            RequestedTheme = Config.Instance.EleTheme;
+
             foreach (var a in Config.Instance.AudioInAllDevices)
                 ListAudioIn.Add(a);
             foreach (var a in Config.Instance.AudioOutAllDevices)

@@ -26,7 +26,8 @@ namespace OneTouchMonitor.Data
     public class Configuration : INotifyPropertyChanged
     {
         private double volume = 0.8;
-        private bool ismono = false;
+        private bool ismono = false,
+                     issound = false;
         private ApplicationTheme theme = ApplicationTheme.Dark;
         private AudioSelectorType btSelector = AudioSelectorType.None;
         private AudioSelectorType audioSelector = AudioSelectorType.None;
@@ -159,6 +160,11 @@ namespace OneTouchMonitor.Data
             get => ismono;
             set { ismono = value; OnPropertyChanged(); }
         }
+        public bool IsSound
+        {
+            get => issound;
+            set { issound = value; OnPropertyChanged(); }
+        }
         [XmlIgnore]
         public bool IsPlay {
             get => Config.AudioCapture.IsPlay;
@@ -169,8 +175,11 @@ namespace OneTouchMonitor.Data
             get => Config.AudioCapture.IsInit;
             set => OnPropertyChanged();
         }
-        public ApplicationTheme Theme
-        {
+        [XmlIgnore]
+        public ElementTheme EleTheme {
+            get => (theme == ApplicationTheme.Dark) ? ElementTheme.Dark : ElementTheme.Light;
+        }
+        public ApplicationTheme Theme {
             get => theme;
             set { theme = value; OnPropertyChanged(); }
         }
@@ -179,9 +188,9 @@ namespace OneTouchMonitor.Data
         public void AudioOutDevicesAdd(List<AudioDevice> list) { AudioOutSelectedDevices.Clear(); AudioOutSelectedDevices.AddRange(list); }
 
         public Configuration() {
-            BtSelectedDevices.Add(new("1234", "Bluetooth music", true, default));
-            BtSelectedDevices.Add(new("1234", "LPT660", true, default));
-            AudioOutSelectedDevices.Add(new("1234", "VA2407 Series (NVIDIA High Definition Audio)", true, default));
+            //BtSelectedDevices.Add(new("1234", "Bluetooth music", true, default));
+            //BtSelectedDevices.Add(new("1234", "LPT660", true, default));
+            //AudioOutSelectedDevices.Add(new("1234", "VA2407 Series (NVIDIA High Definition Audio)", true, default));
             //AudioOutSelectedDevices.Add(new("1234", "NVIDIA High", true, default));
         }
         public void Copy(Configuration cfg, bool isfull) {
@@ -210,6 +219,7 @@ namespace OneTouchMonitor.Data
             BtSelector = cfg.BtSelector;
             Volume = cfg.Volume;
             IsMono = cfg.IsMono;
+            IsSound = cfg.IsSound;
             Theme = cfg.Theme;
         }
     }

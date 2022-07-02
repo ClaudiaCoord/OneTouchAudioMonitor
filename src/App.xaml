@@ -1,8 +1,7 @@
 ﻿<Application
     x:Class="OneTouchMonitor.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:OneTouchMonitor">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Application.Resources>
         <Style x:Key="BoxPanel" TargetType="StackPanel">
             <Setter Property="Margin" Value="4,4,0,4" />

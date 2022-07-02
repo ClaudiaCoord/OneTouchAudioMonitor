@@ -126,6 +126,48 @@
   <data name="FMT4" xml:space="preserve">
     <value>BT устройство : {0} -&gt; Остановка</value>
   </data>
+  <data name="GUI1.Header" xml:space="preserve">
+    <value>Входное устройство</value>
+  </data>
+  <data name="GUI1.PlaceholderText" xml:space="preserve">
+    <value>Выберете устройство ..</value>
+  </data>
+  <data name="GUI2.Header" xml:space="preserve">
+    <value>Выходное устройство</value>
+  </data>
+  <data name="GUI2.PlaceholderText" xml:space="preserve">
+    <value>Выберете устройство ..</value>
+  </data>
+  <data name="GUI3.Header" xml:space="preserve">
+    <value>BT выходное устройство</value>
+  </data>
+  <data name="GUI3.PlaceholderText" xml:space="preserve">
+    <value>Выберете устройство ..</value>
+  </data>
+  <data name="GUI4.Header" xml:space="preserve">
+    <value>Выбор оформления</value>
+  </data>
+  <data name="GUI4.OffContent" xml:space="preserve">
+    <value>Светлая</value>
+  </data>
+  <data name="GUI4.OnContent" xml:space="preserve">
+    <value>Темная</value>
+  </data>
+  <data name="GUI5.OffContent" xml:space="preserve">
+    <value>Выкл</value>
+  </data>
+  <data name="GUI5.OnContent" xml:space="preserve">
+    <value>Вкл</value>
+  </data>
+  <data name="GUI6.Header" xml:space="preserve">
+    <value>Звуки</value>
+  </data>
+  <data name="GUI6.OffContent" xml:space="preserve">
+    <value>Выкл</value>
+  </data>
+  <data name="GUI6.OnContent" xml:space="preserve">
+    <value>Вкл</value>
+  </data>
   <data name="S1" xml:space="preserve">
     <value>Остановка воспроизведения невозможна, занят другим процессом</value>
   </data>
@@ -149,5 +191,11 @@
   </data>
   <data name="S8" xml:space="preserve">
     <value>Входное устройство не найдено..</value>
+  </data>
+  <data name="TITLE1" xml:space="preserve">
+    <value>Монитор</value>
+  </data>
+  <data name="TITLE2" xml:space="preserve">
+    <value>Настройки</value>
   </data>
 </root>

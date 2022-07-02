@@ -240,9 +240,8 @@
                             VerticalAlignment="Top"
                             Orientation="Horizontal">
                             <ToggleSwitch
+                                x:Uid="GUI5"
                                 Width="140"
-                                OffContent="Off"
-                                OnContent="On"
                                 IsOn="{Binding IsEqEnable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </StackPanel>
                     </StackPanel>
