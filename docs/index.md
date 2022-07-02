@@ -11,6 +11,9 @@ Supports all kinds of audio input and output devices, including Bluetooth device
 
 ![OneTouch Audio Monitor](https://claudiacoord.github.io/OneTouchAudioMonitor/img1.png) 
 
+Windows UWP software, support platform: `x86`,`x64`,`ARM`,`ARM64`  
+
+
 ### Installation:
 
 You need to enable Developer mode on your computer.  
