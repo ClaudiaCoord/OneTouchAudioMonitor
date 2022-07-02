@@ -1,38 +1,27 @@
-##  to GitHub Pages
 
-You can use the [editor on GitHub](https://github.com/ClaudiaCoord/OneTouchAudioMonitor/edit/main/docs/index.md) to maintain and preview the content for your website in Markdown files.
+[![Windows](https://svgshare.com/i/ZhY.svg)](https://svgshare.com/i/ZhY.svg)
+[![GitHub license](https://img.shields.io/github/license/ClaudiaCoord/OneTouchAudioMonitor.svg)](https://github.com/ClaudiaCoord/OneTouchAudioMonitor/blob/master/LICENSE)
+[![Download All](https://img.shields.io/badge/Download-All-brightgreen.svg?style=flat-square)](https://github.com/ClaudiaCoord/OneTouchAudioMonitor/releases/download/1.0.8.0/OneTouchMonitor_1.0.8.0.zip)
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
 
-### Markdown
+# OneTouch Audio Input Monitor (UWP)
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+![OneTouch Audio Monitor](docs/img1.png) 
 
-```markdown
-Syntax highlighted code block
+### Installation:
 
-# Header 1
-## Header 2
-### Header 3
+You need to enable Developer mode on your computer.  
 
-- Bulleted
-- List
+- Open Settings.  
+- Click on Update & security.  
+- Click on For developers.  
+- Under Use developer features enable Developer mode.  
+- Enable Developer Mode in Windows `10`/`11`, and Click `Yes`.  
+- Restart your computer to complete the task.  
+- Download latest [release](https://github.com/ClaudiaCoord/OneTouchAudioMonitor/releases/download/1.0.8.0/OneTouchMonitor_1.0.8.0.zip) `OneTouchAudioMonitor_X.X.X.X.zip`.  
+- Unzip file.  
+- Run shell as Administrator.  
+- Type in the command line `.\Install.cmd` or `powershell .\Install.ps1`  
+- Done.  
 
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/ClaudiaCoord/OneTouchAudioMonitor/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
-Welcome
+Check the windows start menu, there should be a shortcut named `OneTouch Monitor`..  
