@@ -6,7 +6,7 @@
 
 # OneTouch Audio Input Monitor (UWP)
 
-![OneTouch Audio Monitor](docs/img1.png) 
+![OneTouch Audio Monitor](https://claudiacoord.github.io/OneTouchAudioMonitor/img1.png) 
 
 ### Installation:
 
