@@ -11,12 +11,10 @@
 
 `One Touch Audio Monitor` is designed to quickly switch input audio devices to selected output audio devices with one touch.  For example, it is relevant for quickly listening to a microphone, usually on headphones connected both with a wire and with a Bluetooth connection.
 
-Supports all kinds of audio input and output devices, including Bluetooth devices.
+Supports all kinds of `audio` input and output devices, including `Bluetooth` devices.
 
 Activation in the mode of output audio devices, or Bluetooth audio devices is provided.
-
 When activated, the application automatically connects the pre-selected output device if it is connected and available.
-
 To connect, you also need the availability of the selected input device.  If no input or output devices are available, the application goes into standby mode and connects when the correct devices are connected.
  
 ### Installation:
@@ -40,3 +38,5 @@ Check the windows start menu, there should be a shortcut named `OneTouch Monitor
 ### Interfaces screens:
 
 ![OneTouch Audio Monitor](docs/img1.png) 
+
+Windows UWP software, support platform: `x86`,`x64`,`ARM`,`ARM64`

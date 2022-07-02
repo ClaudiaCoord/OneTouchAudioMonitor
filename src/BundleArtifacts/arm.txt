@@ -1,1 +1,0 @@
-MainPackage=E:\__BuildSource\__SVN__\OneTouchMonitor\bin\ARM\Release\OneTouchMonitor_1.0.8.0_ARM.msix
