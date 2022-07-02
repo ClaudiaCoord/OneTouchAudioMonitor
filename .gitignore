@@ -33,6 +33,7 @@ _LIBS/
 AppPackages/
 packages/
 src/*.aip
+src/BundleArtifacts/*
 src/BuildCert.ps1
 msbuild.log
 msbuild.err
