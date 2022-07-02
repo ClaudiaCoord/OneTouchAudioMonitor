@@ -17,7 +17,6 @@ nupkg/
 *.pfx
 
 # Build results
-/bin/*
 Releases/
 [Dd]ebug/
 [Dd]ebug/
@@ -31,20 +30,13 @@ build/
 [Oo]ut/
 _DEVEL/
 _LIBS/
+AppPackages/
 packages/
 src/*.aip
+src/BuildCert.ps1
 msbuild.log
 msbuild.err
 msbuild.wrn
 README.*.*
 *.vssbe
-
-/AppPackages/*
-/docs/*.txt
-/docs/*.ico
-/src/*.aip
-/src/BuildCert.ps1
-/src/OneTouchMonitorRoot.pfx
-/src/bin/*
-/src/obj/*
 

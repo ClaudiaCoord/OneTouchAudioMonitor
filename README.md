@@ -16,3 +16,4 @@ You need to enable Developer mode on your computer.
 - Run shell as Administrator.  
 - Type in the command line `.\Install.cmd` or `powershell .\Install.ps1`
 - Done.
+=======
