@@ -11,7 +11,7 @@
 
 `One Touch Audio Monitor` is designed to quickly switch input audio devices to selected output audio devices with one touch.  For example, it is relevant for quickly listening to a microphone, usually on headphones connected both with a wire and with a Bluetooth connection.
 
-Supports all kinds of `audio` input and output devices, including `Bluetooth` devices.
+Supports all kinds of `audio` input and output devices, including `Bluetooth` devices.  
 Support for multimedia buttons on Bluetooth devices, buttons: `play`, `pause`, `stop`.
 
 Activation in the mode of output audio devices, or Bluetooth audio devices is provided.
