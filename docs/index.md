@@ -1,7 +1,7 @@
 
 [![Windows](https://svgshare.com/i/ZhY.svg)](https://svgshare.com/i/ZhY.svg)
 [![GitHub license](https://img.shields.io/github/license/ClaudiaCoord/OneTouchAudioMonitor.svg)](https://github.com/ClaudiaCoord/OneTouchAudioMonitor/blob/master/LICENSE)
-[![Download All](https://img.shields.io/badge/Download-All-brightgreen.svg?style=flat-square)](https://github.com/ClaudiaCoord/OneTouchAudioMonitor/releases/download/1.0.8.0/OneTouchMonitor_1.0.8.0.zip)
+[![Download All](https://img.shields.io/badge/Download-All-brightgreen.svg?style=flat-square)](https://github.com/ClaudiaCoord/OneTouchAudioMonitor/releases/download/1.0.9.0/OneTouchMonitor_1.0.9.0.zip)
 
 
 # OneTouch Audio Input Monitor (UWP)
@@ -24,7 +24,7 @@ You need to enable Developer mode on your computer.
 - Under Use developer features enable Developer mode.  
 - Enable Developer Mode in Windows `10`/`11`, and Click `Yes`.  
 - Restart your computer to complete the task.  
-- Download latest [release](https://github.com/ClaudiaCoord/OneTouchAudioMonitor/releases/download/1.0.8.0/OneTouchMonitor_1.0.8.0.zip) `OneTouchAudioMonitor_X.X.X.X.zip`.  
+- Download latest [release](https://github.com/ClaudiaCoord/OneTouchAudioMonitor/releases/download/1.0.9.0/OneTouchMonitor_1.0.9.0.zip) `OneTouchAudioMonitor_X.X.X.X.zip`.  
 - Unzip file.  
 - Run shell as Administrator.  
 - Type in the command line `.\Install.cmd` or `powershell .\Install.ps1`  
