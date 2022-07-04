@@ -49,8 +49,11 @@
 
   <Capabilities>
     <Capability Name="internetClient" />
+    <rescap:Capability Name="appCaptureSettings"/>
     <rescap:Capability Name="confirmAppClose"/>
+    <rescap:Capability Name="broadFileSystemAccess"/>
     <uap3:Capability Name="backgroundMediaPlayback"/>
+    <uap:Capability Name="musicLibrary"/>
     <DeviceCapability Name="bluetooth"/>
     <DeviceCapability Name="microphone"/>
     <DeviceCapability Name="radios"/>

@@ -16,11 +16,10 @@
         </Style>
     </Page.Resources>
 
-    <Grid MinWidth="340" Background="#FF272727">
+    <Grid MinWidth="340" Background="{ThemeResource BgWindowColor}">
         <StackPanel x:Name="rootPanel" Orientation="Vertical">
             <StackPanel
                 Width="{Binding ActualWidth, ElementName=rootPanel, FallbackValue=340, Mode=OneWay}"
-                Margin="4,10,0,4"
                 HorizontalAlignment="Left"
                 Orientation="Horizontal"
                 Style="{StaticResource BoxPanel}">
@@ -31,7 +30,7 @@
                     Background="Transparent"
                     Click="Button_ClickReturn"
                     Content="&#xEC52;"
-                    Foreground="#FFF7F3F3"
+                    Foreground="{ThemeResource NawIconsColor}"
                     Style="{StaticResource ButtonIcon}" />
 
                 <Button
@@ -39,14 +38,14 @@
                     Background="Transparent"
                     Click="Button_ClickSave"
                     Content="&#xE792;"
-                    Foreground="White"
+                    Foreground="{ThemeResource NawIconsColor}"
                     Style="{StaticResource ButtonIcon}" />
 
                 <Button
                     Background="Transparent"
                     Click="Button_ClickErase"
                     Content="&#xED60;"
-                    Foreground="White"
+                    Foreground="{ThemeResource NawIconsColor}"
                     Style="{StaticResource ButtonIcon}" />
             </StackPanel>
 
@@ -75,6 +74,7 @@
                     SelectedItem="{Binding ItemBtOut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Style="{StaticResource BoxList}" />
             </StackPanel>
+
             <StackPanel
                 Width="{Binding ActualWidth, ElementName=rootPanel, FallbackValue=340, Mode=OneWay}"
                 Padding="10"

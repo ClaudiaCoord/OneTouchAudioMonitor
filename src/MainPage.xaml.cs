@@ -27,7 +27,7 @@ namespace OneTouchMonitor
 {
     public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
-        public static Size Size = new Size(340, 400);
+        public static Size Size = new Size(340, 410);
         public static string Title => Config.GetString("TITLE1");
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -89,6 +89,8 @@ namespace OneTouchMonitor
 
         public bool IsPlay => !Config.Instance.IsPlay && !Config.Instance.IsInit && IsAudioInDevice && (IsAudioOn || IsBTOn);
         public bool IsStop => Config.Instance.IsPlay || Config.Instance.IsInit;
+        public bool IsRecord => Config.Instance.IsRecord;
+        public bool IsRecordEnable => IsStop;
         public bool IsPlayStatus => Config.Instance.IsPlay;
         public bool IsInitStatus => Config.Instance.IsInit;
         public bool IsCallSettings => !IsInitStatus && !IsPlayStatus;
@@ -149,13 +151,15 @@ namespace OneTouchMonitor
             OnPropertyChanged(s,
                 nameof(IsPlay),
                 nameof(IsStop),
+                nameof(IsRecord),
                 nameof(IsPlayStatus),
                 nameof(IsInitStatus),
                 nameof(IsCallSettings),
                 nameof(IsAudioInDevice),
                 nameof(IsAudioOutEnable),
                 nameof(IsBtOutEnable),
-                nameof(IsWarning));
+                nameof(IsWarning),
+                nameof(IsRecordEnable));
             BtPropertyChanged();
             AudioPropertyChanged();
 #           if DEBUG_PropertyChanged
@@ -241,9 +245,11 @@ namespace OneTouchMonitor
             Window.Current.CoreWindow.KeyDown += CoreWindow_KeyDown;
 
             if (mediaCtrl != default) {
+                mediaCtrl.IsNextEnabled = true;
                 mediaCtrl.IsPlayEnabled = true;
                 mediaCtrl.IsStopEnabled = true;
                 mediaCtrl.IsPauseEnabled = true;
+                mediaCtrl.IsPreviousEnabled = true;
                 mediaCtrl.ButtonPressed += TransportCtrl_ButtonPressed;
             }
             if (Config.Instance.IsSound) {
@@ -281,27 +287,34 @@ namespace OneTouchMonitor
             else if ((a.Button.HasFlag(SystemMediaTransportControlsButton.Pause) ||
                  a.Button.HasFlag(SystemMediaTransportControlsButton.Stop)) && IsStop)
                 ClickStop();
+            else if (a.Button.HasFlag(SystemMediaTransportControlsButton.Next) ||
+                     a.Button.HasFlag(SystemMediaTransportControlsButton.Previous))
+                ClickRecord();
         }
 
         private void CoreWindow_KeyDown(CoreWindow s, KeyEventArgs a) {
             if (((a.VirtualKey == VirtualKey.Stop) || (a.VirtualKey == VirtualKey.Pause)) && IsStop)
                 ClickStop();
             else if ((int)a.VirtualKey == 179) {
-                if (IsStop)
-                    ClickStop();
-                else if (IsPlay)
-                    ClickPlay();
+                if (IsStop) ClickStop();
+                else if (IsPlay) ClickPlay();
             }
             else if (a.VirtualKey == VirtualKey.F2) {
                 if (IsBTOn) IsBTOn = false;
-                else if (!IsBTOn && !IsAudioOn) IsBTOn = true;
+                else if (!IsAudioOn) IsBTOn = true;
             }
             else if (a.VirtualKey == VirtualKey.F3) {
                 if (IsAudioOn) IsAudioOn = false;
-                else if (!IsAudioOn && !IsBTOn) IsAudioOn = true;
+                else if (!IsBTOn) IsAudioOn = true;
             }
             else if ((a.VirtualKey == VirtualKey.F4) && IsCallSettings)
                 ClickSetup();
+            else if ((a.VirtualKey == VirtualKey.F5) && IsPlay)
+                ClickPlay();
+            else if ((a.VirtualKey == VirtualKey.F6) && IsRecordEnable)
+                ClickRecord();
+            else if ((a.VirtualKey == VirtualKey.F8) && IsStop)
+                ClickStop();
         }
 
         private async void Button_ClickMinimize(object sender, RoutedEventArgs e) {
@@ -310,13 +323,13 @@ namespace OneTouchMonitor
             await resourceInfos[0].StartSuspendAsync();
         }
 
-        private async void Button_ClickExit(object sender, RoutedEventArgs _) =>
+        private async void Button_ClickExit(object __, RoutedEventArgs _) =>
             await ApplicationView.GetForCurrentView().TryConsolidateAsync();
 
-        private async void Button_ClickPlay(object sender, RoutedEventArgs _) =>
+        private async void Button_ClickPlay(object __, RoutedEventArgs _) =>
             await Config.AudioCapture.Start().ConfigureAwait(false);
 
-        private async void Button_ClickStop(object sender, RoutedEventArgs _) {
+        private async void Button_ClickStop(object __, RoutedEventArgs _) {
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
                 LogString = string.Empty;
                 Config.AudioCapture.Stop();
@@ -326,6 +339,7 @@ namespace OneTouchMonitor
         private void ClickPlay() => Button_ClickPlay(null, null);
         private void ClickStop() => Button_ClickStop(null, null);
         private void ClickSetup() => Button_ClickSetup(null, null);
+        private void ClickRecord() => Button_ClickRecord(null, null);
 
         private async void Button_ClickReset(object sender, RoutedEventArgs __) =>
             _ = await ClickReset().ConfigureAwait(false);
@@ -337,8 +351,15 @@ namespace OneTouchMonitor
                 return true;
             });
 
-        private void Button_ClickSetup(object sender, RoutedEventArgs e) =>
+        private void Button_ClickSetup(object __, RoutedEventArgs e) =>
             ((App)App.Current).OnNavigatedTo(AppPageType.MainSetup);
+
+        private async void Button_ClickRecord(object __, RoutedEventArgs _) {
+            if (IsRecord) Config.AudioCapture.StopRecord();
+            else await Config.AudioCapture.StartRecord().ConfigureAwait(false);
+            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    OnPropertyChanged(nameof(IsRecord), nameof(IsRecordEnable)));
+        }
 
         #region ToString
 #       if DEBUG

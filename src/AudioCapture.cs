@@ -2,9 +2,9 @@
  * Git: https://github.com/ClaudiaCoord/OneTouchAudioMonitor
  * Copyright (c) 2022 СС
  * License MIT.
-*/
+ */
+
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,15 +12,11 @@ using OneTouchMonitor.Data;
 using OneTouchMonitor.Event;
 using OneTouchMonitor.Events;
 using Windows.ApplicationModel.Background;
-using Windows.Devices.Enumeration;
-using Windows.Foundation;
-using Windows.Media;
 using Windows.Media.Audio;
 using Windows.Media.Capture;
-using Windows.Media.Devices;
 using Windows.Media.MediaProperties;
 using Windows.Media.Render;
-using Windows.UI.Xaml.Controls;
+using Windows.Storage;
 
 namespace OneTouchMonitor
 {
@@ -56,12 +52,14 @@ namespace OneTouchMonitor
         private AudioGraph audioGraph { get; set; }
         private AudioDeviceOutputNode deviceOut { get; set; }
         private AudioDeviceInputNode deviceIn { get; set; }
+        private AudioFileOutputNode fileOut { get; set; } = default;
         private AudioDevice AudioOutDev { get; set; }
         private RunOnce runOncePlay { get; set; } = new((b) => Config.Instance.IsPlay = b);
         private RunOnce runOnceInit { get; set; } = new((b) => Config.Instance.IsInit = b);
-        private CancellationTokenSource token { get; set; } = default(CancellationTokenSource);
+        private CancellationTokenSource tokenPlay { get; set; } = default(CancellationTokenSource);
 
         public AudioCaptureEqualizer Equalizer { get; set; } = default;
+        public bool IsRecord => IsPlay && (fileOut != default);
         public bool IsPlay => runOncePlay.IsRun || (AudioOutDev != default);
         public bool IsInit => runOnceInit.IsRun;
         private double Volume {
@@ -99,8 +97,8 @@ namespace OneTouchMonitor
         #region Dispose
         public void Dispose()
         {
-            CancellationTokenSource t = token;
-            token = default;
+            CancellationTokenSource t = tokenPlay;
+            tokenPlay = default;
             if ((t != null) && !t.IsCancellationRequested)
                 t.Cancel();
 
@@ -113,6 +111,8 @@ namespace OneTouchMonitor
             Equalizer = default;
             if (acq != null)
                 acq.Dispose();
+
+            DisposeFileRecord();
 
             AudioDeviceInputNode i = deviceIn;
             deviceIn = null;
@@ -142,26 +142,38 @@ namespace OneTouchMonitor
             }
             runOncePlay.Invoke(false);
         }
-        private void DisposeTokenSrc() {
-            CancellationTokenSource t = token;
-            token = default;
+        private void DisposeTokenPlay() {
+            CancellationTokenSource t = tokenPlay;
+            tokenPlay = default;
             if (t != null) {
                 if (!t.IsCancellationRequested)
                     t.Cancel();
                 t.Dispose();
             }
         }
+        private void DisposeFileRecord() {
+            try {
+                AudioFileOutputNode f = fileOut;
+                fileOut = default;
+                if (f != null) {
+                    f.Stop();
+                    if (deviceIn != default)
+                        deviceIn.RemoveOutgoingConnection(f);
+                    ToLog(this, $"{Config.GetString("S10")}: '{f.File.Name}'");
+                    f.Dispose();
+                }
+            } catch { }
+        }
         #endregion
 
-        public async void Run(IBackgroundTaskInstance bti)
-        {
+        public async void Run(IBackgroundTaskInstance bti) {
             deferral = bti.GetDeferral();
             while (IsPlay) { await Task.Delay(15).ConfigureAwait(false); }
             deferral.Complete();
             deferral = default;
         }
 
-        #region Start/Stop
+        #region Start/Stop Play
         public async Task<bool> Start() =>
             await Task.Run(async () => {
 
@@ -176,11 +188,11 @@ namespace OneTouchMonitor
                         return false;
                     }
 
-                    DisposeTokenSrc();
-                    token = new();
+                    DisposeTokenPlay();
+                    tokenPlay = new();
 
                     AudioDevice dev = default;
-                    CancellationToken t = token.Token;
+                    CancellationToken t = tokenPlay.Token;
                     CancellationTokenSource cts = new(TimeSpan.FromSeconds(12));
                     while (!cts.IsCancellationRequested) {
                         bool[] b = new bool[] {
@@ -223,11 +235,11 @@ namespace OneTouchMonitor
                         return false;
                     }
 
-                    DisposeTokenSrc();
-                    token = new();
+                    DisposeTokenPlay();
+                    tokenPlay = new();
 
                     AudioDevice dev = default;
-                    CancellationToken t = token.Token;
+                    CancellationToken t = tokenPlay.Token;
                     CancellationTokenSource cts = new(TimeSpan.FromSeconds(8));
                     while (!cts.IsCancellationRequested) {
                         switch (at) {
@@ -272,7 +284,7 @@ namespace OneTouchMonitor
                 bool isinit = false;
                 try {
 
-                    DisposeTokenSrc();
+                    DisposeTokenPlay();
 
                     AudioDevice AudioInDev = IsAudioInDeviceFound();
                     if (AudioInDev == default) {
@@ -280,7 +292,7 @@ namespace OneTouchMonitor
                         return false;
                     }
 
-                    token = new();
+                    tokenPlay = new();
 
                     AudioOutDev = dev;
                     AudioOutDev.IsPlay = true;
@@ -388,6 +400,51 @@ namespace OneTouchMonitor
             try { Dispose(); }
             catch (Exception ex) { ToLog(this, ex); }
             finally { runOnceInit.End(); }
+        }
+        #endregion
+
+        #region Start/Stop Record
+        public async Task<bool> StartRecord() =>
+            await Task.Run(async () => {
+                try {
+                    if (IsRecord || (deviceIn == default)) return false;
+                    DisposeFileRecord();
+
+                    DateTime now = DateTime.Now;
+                    StorageFolder folder = KnownFolders.MusicLibrary;
+                    if (folder == default) return false;
+
+                    StorageFile file = await folder.CreateFileAsync(
+                        $"{deviceIn.Device.Name}-{now.Year}-{now.Month}-{now.Day}-{now.Hour}-{now.Minute}-{now.Second}.mp3",
+                        CreationCollisionOption.ReplaceExisting);
+                    if (file == default) return false;
+
+                    var fileResult = await audioGraph.CreateFileOutputNodeAsync(
+                        file, MediaEncodingProfile.CreateMp3(AudioEncodingQuality.Medium));
+                    if (fileResult.Status != AudioFileNodeCreationStatus.Success) return false;
+
+                    fileOut = fileResult.FileOutputNode;
+                    fileOut.OutgoingGain = volval;
+                    if (deviceIn == default) DisposeFileRecord();
+                    else {
+                        deviceIn.AddOutgoingConnection(fileOut);
+                        ToLog(this, $"{Config.GetString("S9")}: '{fileOut.File.Name}'");
+                        System.Diagnostics.Debug.WriteLine(fileOut.File.Path);
+                        return true;
+                    }
+                }
+                catch (Exception ex) { ToLog(this, ex); }
+                return false;
+            });
+
+        public bool StopRecord() {
+            try {
+                if (!IsRecord || (fileOut == default)) return false;
+                DisposeFileRecord();
+                return true;
+            }
+            catch (Exception ex) { ToLog(this, ex); }
+            return false;
         }
         #endregion
 

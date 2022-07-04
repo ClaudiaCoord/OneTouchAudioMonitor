@@ -171,6 +171,9 @@
   <data name="S1" xml:space="preserve">
     <value>Остановка воспроизведения невозможна, занят другим процессом</value>
   </data>
+  <data name="S10" xml:space="preserve">
+    <value>Запись окончена</value>
+  </data>
   <data name="S2" xml:space="preserve">
     <value>Аудио устройства не обнаружены, ждите..</value>
   </data>
@@ -191,6 +194,9 @@
   </data>
   <data name="S8" xml:space="preserve">
     <value>Входное устройство не найдено..</value>
+  </data>
+  <data name="S9" xml:space="preserve">
+    <value>Записываю в файл</value>
   </data>
   <data name="TITLE1" xml:space="preserve">
     <value>Монитор</value>

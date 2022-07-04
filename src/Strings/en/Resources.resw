@@ -171,6 +171,9 @@
   <data name="S1" xml:space="preserve">
     <value>Cannot stop playback, busy with another process</value>
   </data>
+  <data name="S10" xml:space="preserve">
+    <value>Recording over</value>
+  </data>
   <data name="S2" xml:space="preserve">
     <value>No audio devices found, please wait..</value>
   </data>
@@ -191,6 +194,9 @@
   </data>
   <data name="S8" xml:space="preserve">
     <value>Input device not found..</value>
+  </data>
+  <data name="S9" xml:space="preserve">
+    <value>Write to a file</value>
   </data>
   <data name="TITLE1" xml:space="preserve">
     <value>Audio Monitor</value>

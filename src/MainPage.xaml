@@ -11,7 +11,7 @@
         <local:IndicateIconForeground x:Key="IconForeground" />
     </Page.Resources>
 
-    <Grid Background="#FF272727">
+    <Grid Background="{ThemeResource BgWindowColor}">
         <StackPanel
             x:Name="rootPanel"
             Width="340"
@@ -20,7 +20,6 @@
 
             <StackPanel
                 Width="{Binding ActualWidth, ElementName=rootPanel, FallbackValue=340, Mode=OneWay}"
-                Margin="4,10,0,4"
                 HorizontalAlignment="Left"
                 Orientation="Horizontal"
                 Style="{StaticResource BoxPanel}">
@@ -31,7 +30,7 @@
                     Background="Transparent"
                     Click="Button_ClickMinimize"
                     Content="&#xEC52;"
-                    Foreground="#FFF7F3F3"
+                    Foreground="{ThemeResource NawIconsColor}"
                     Style="{StaticResource ButtonIcon}" />
 
                 <Button
@@ -39,14 +38,14 @@
                     Background="Transparent"
                     Click="Button_ClickReset"
                     Content="&#xED10;"
-                    Foreground="White"
+                    Foreground="{ThemeResource NawIconsColor}"
                     Style="{StaticResource ButtonIcon}" />
 
                 <Button
                     Background="Transparent"
                     Click="Button_ClickExit"
                     Content="&#xF3B1;"
-                    Foreground="White"
+                    Foreground="{ThemeResource NawIconsColor}"
                     Style="{StaticResource ButtonIcon}" />
             </StackPanel>
 
@@ -57,7 +56,7 @@
                 Style="{StaticResource BoxPanel}">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -70,7 +69,7 @@
                         Grid.Row="0"
                         Grid.RowSpan="2"
                         Grid.Column="0"
-                        Height="200"
+                        Height="245"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
                         Maximum="9.0"
@@ -83,7 +82,7 @@
                     <StackPanel
                         Grid.Row="0"
                         Grid.Column="1"
-                        Margin="0,20,0,0"
+                        Margin="0,5,0,0"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Top"
                         Orientation="Vertical"
@@ -105,11 +104,15 @@
                             Glyph="&#xEDB5;"
                             Style="{StaticResource IndicateIcon}" />
                         <FontIcon
-                            Foreground="{Binding Path=IsInitStatus, Mode=OneWay, Converter={StaticResource IconForeground}, ConverterParameter=OrangeRed}"
+                            Foreground="{Binding Path=IsRecord, Mode=OneWay, Converter={StaticResource IconForeground}, ConverterParameter=Red}"
                             Glyph="&#xE81D;"
                             Style="{StaticResource IndicateIcon}" />
                         <FontIcon
-                            Foreground="{Binding Path=IsWarning, Mode=OneWay, Converter={StaticResource IconForeground}, ConverterParameter=Red}"
+                            Foreground="{Binding Path=IsInitStatus, Mode=OneWay, Converter={StaticResource IconForeground}, ConverterParameter=OrangeRed}"
+                            Glyph="&#xF080;"
+                            Style="{StaticResource IndicateIcon}" />
+                        <FontIcon
+                            Foreground="{Binding Path=IsWarning, Mode=OneWay, Converter={StaticResource IconForeground}, ConverterParameter=DarkRed}"
                             Glyph="&#xEB56;"
                             Style="{StaticResource IndicateIcon}" />
                     </StackPanel>
@@ -117,6 +120,7 @@
                     <StackPanel
                         Grid.Row="0"
                         Grid.Column="2"
+                        Margin="0,30,0,0"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Top"
                         Orientation="Vertical"
@@ -126,6 +130,7 @@
                             Margin="5"
                             Content="&#xEC41;"
                             FontFamily="Segoe MDL2 Assets"
+                            ToolTipService.ToolTip="F2"
                             IsChecked="{Binding Path=IsBTOn, FallbackValue=false, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             IsEnabled="{Binding Path=IsBTAutoEnable, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Style="{StaticResource ToggleButtonStyleBT}" />
@@ -134,6 +139,7 @@
                             Margin="5"
                             Content="&#xF0EB;"
                             FontFamily="Segoe MDL2 Assets"
+                            ToolTipService.ToolTip="F3"
                             IsChecked="{Binding Path=IsAudioOn, FallbackValue=false, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             IsEnabled="{Binding Path=IsAudioAutoEnable, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Style="{StaticResource ToggleButtonStyleAudio}" />
@@ -144,6 +150,7 @@
                             Click="Button_ClickSetup"
                             Content="&#xE835;"
                             Foreground="Black"
+                            ToolTipService.ToolTip="F4"
                             IsEnabled="{Binding Path=IsCallSettings, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Style="{StaticResource ButtonIcon}" />
                     </StackPanel>
@@ -158,21 +165,34 @@
 
                         <Button
                             Width="50"
-                            Margin="5"
+                            Margin="2"
                             Background="#FF08A608"
                             Click="Button_ClickPlay"
                             Content="&#xF5B0;"
                             Foreground="White"
+                            ToolTipService.ToolTip="F5"
                             IsEnabled="{Binding Path=IsPlay, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Style="{StaticResource ButtonIcon}" />
 
                         <Button
                             Width="50"
-                            Margin="5"
+                            Margin="2"
+                            Background="#DD0D0D"
+                            Click="Button_ClickRecord"
+                            Content="&#xE7C8;"
+                            Foreground="Bisque"
+                            ToolTipService.ToolTip="F6"
+                            IsEnabled="{Binding Path=IsRecordEnable, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            Style="{StaticResource ButtonIcon}" />
+
+                        <Button
+                            Width="50"
+                            Margin="2"
                             Background="#FF871105"
                             Click="Button_ClickStop"
                             Content="&#xF8AE;"
                             Foreground="#FFDACCCC"
+                            ToolTipService.ToolTip="F8"
                             IsEnabled="{Binding Path=IsStop, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                             Style="{StaticResource ButtonIcon}" />
                     </StackPanel>
@@ -185,12 +205,12 @@
                         Style="{StaticResource BoxPanel}">
 
                         <StackPanel
-                            Margin="0,20,0,0"
+                            Margin="0,35,0,0"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Top"
                             Orientation="Horizontal">
                             <Slider
-                                Height="200"
+                                Height="234"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
                                 Maximum="7.94"
@@ -201,7 +221,7 @@
                                 TickPlacement="Outside"
                                 Value="{Binding Path=AudioEq1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             <Slider
-                                Height="200"
+                                Height="234"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
                                 Maximum="7.94"
@@ -212,7 +232,7 @@
                                 TickPlacement="Outside"
                                 Value="{Binding Path=AudioEq2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             <Slider
-                                Height="200"
+                                Height="234"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
                                 Maximum="7.94"
@@ -223,7 +243,7 @@
                                 TickPlacement="Outside"
                                 Value="{Binding Path=AudioEq3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             <Slider
-                                Height="200"
+                                Height="234"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
                                 Maximum="7.94"

@@ -4,18 +4,17 @@
  * License MIT.
 */
 using System;
-using System.Linq;
-using System.Text;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using OneTouchMonitor.Events;
 using Windows.UI.Xaml;
 using RES = Windows.ApplicationModel.Resources;
-using Windows.UI.Xaml.Controls.Primitives;
 
 namespace OneTouchMonitor.Data
 {
@@ -176,6 +175,11 @@ namespace OneTouchMonitor.Data
             set => OnPropertyChanged();
         }
         [XmlIgnore]
+        public bool IsRecord {
+            get => Config.AudioCapture.IsRecord;
+            set => OnPropertyChanged();
+        }
+        [XmlIgnore]
         public ElementTheme EleTheme {
             get => (theme == ApplicationTheme.Dark) ? ElementTheme.Dark : ElementTheme.Light;
         }
@@ -187,12 +191,8 @@ namespace OneTouchMonitor.Data
         public void BtOutDevicesAdd(List<BtDevice> list) { BtAwailDevices.Clear();  BtAwailDevices.AddRange(list); }
         public void AudioOutDevicesAdd(List<AudioDevice> list) { AudioOutSelectedDevices.Clear(); AudioOutSelectedDevices.AddRange(list); }
 
-        public Configuration() {
-            //BtSelectedDevices.Add(new("1234", "Bluetooth music", true, default));
-            //BtSelectedDevices.Add(new("1234", "LPT660", true, default));
-            //AudioOutSelectedDevices.Add(new("1234", "VA2407 Series (NVIDIA High Definition Audio)", true, default));
-            //AudioOutSelectedDevices.Add(new("1234", "NVIDIA High", true, default));
-        }
+        public Configuration() { }
+
         public void Copy(Configuration cfg, bool isfull) {
             if (cfg == null)
                 return;

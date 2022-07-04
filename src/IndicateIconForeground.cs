@@ -4,6 +4,7 @@
  * License MIT.
 */
 using System;
+using OneTouchMonitor.Data;
 using Windows.UI;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Markup;
@@ -17,16 +18,23 @@ namespace OneTouchMonitor
                 if (parameter is string s) {
                     return b ?
                         new SolidColorBrush((Color)XamlBindingHelper.ConvertValue(typeof(Color), s)) :
-                        new SolidColorBrush(Colors.SlateGray);
+                        DefaultColor();
                 }
                 return b ?
                     new SolidColorBrush(Colors.LightGreen) :
-                    new SolidColorBrush(Colors.SlateGray);
+                    DefaultColor();
             }
-            return new SolidColorBrush(Colors.SlateGray);
+            return DefaultColor();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language) =>
-            new SolidColorBrush(Colors.DarkGray);
+            DefaultColor();
+
+        private SolidColorBrush DefaultColor()
+        {
+            return (Config.Instance.Theme == Windows.UI.Xaml.ApplicationTheme.Light) ?
+                new SolidColorBrush(Colors.LightGray) :
+                new SolidColorBrush(Colors.SlateGray);
+        }
     }
 }

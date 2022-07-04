@@ -18,7 +18,7 @@ namespace OneTouchMonitor
 {
     public sealed partial class SettingPage : Page, INotifyPropertyChanged
     {
-        public static Size Size = new Size(340, 400);
+        public static Size Size = new Size(340, 410);
         public static string Title => Config.GetString("TITLE2");
 
         public ObservableCollection<AudioDevice> ListAudioIn { get; } = new();
