@@ -90,7 +90,7 @@ namespace OneTouchMonitor
         public bool IsPlay => !Config.Instance.IsPlay && !Config.Instance.IsInit && IsAudioInDevice && (IsAudioOn || IsBTOn);
         public bool IsStop => Config.Instance.IsPlay || Config.Instance.IsInit;
         public bool IsRecord => Config.Instance.IsRecord;
-        public bool IsRecordEnable => IsStop;
+        public bool IsRecordEnable => IsStop && !Config.Instance.IsInit;
         public bool IsPlayStatus => Config.Instance.IsPlay;
         public bool IsInitStatus => Config.Instance.IsInit;
         public bool IsCallSettings => !IsInitStatus && !IsPlayStatus;
