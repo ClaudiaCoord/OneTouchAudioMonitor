@@ -219,7 +219,8 @@
                                 StepFrequency="0.1"
                                 TickFrequency="0.5"
                                 TickPlacement="Outside"
-                                Value="{Binding Path=AudioEq1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                Value="{Binding Path=AudioEq1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                IsEnabled="{Binding IsEqEnable, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <Slider
                                 Height="234"
                                 HorizontalAlignment="Left"
@@ -230,7 +231,8 @@
                                 StepFrequency="0.1"
                                 TickFrequency="0.5"
                                 TickPlacement="Outside"
-                                Value="{Binding Path=AudioEq2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                Value="{Binding Path=AudioEq2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                IsEnabled="{Binding IsEqEnable, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <Slider
                                 Height="234"
                                 HorizontalAlignment="Left"
@@ -241,7 +243,8 @@
                                 StepFrequency="0.1"
                                 TickFrequency="0.5"
                                 TickPlacement="Outside"
-                                Value="{Binding Path=AudioEq3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                Value="{Binding Path=AudioEq3, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                IsEnabled="{Binding IsEqEnable, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                             <Slider
                                 Height="234"
                                 HorizontalAlignment="Left"
@@ -252,7 +255,8 @@
                                 StepFrequency="0.1"
                                 TickFrequency="0.5"
                                 TickPlacement="Outside"
-                                Value="{Binding Path=AudioEq4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                Value="{Binding Path=AudioEq4, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                IsEnabled="{Binding IsEqEnable, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
                         <StackPanel
                             Margin="5,10,0,0"
