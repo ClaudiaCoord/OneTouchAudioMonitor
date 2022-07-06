@@ -10,7 +10,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Markup;
 using Windows.UI.Xaml.Media;
 
-namespace OneTouchMonitor
+namespace OneTouchMonitor.Utils
 {
     public class IndicateIconForeground : IValueConverter {
         public object Convert(object value, Type targetType, object parameter, string language) {

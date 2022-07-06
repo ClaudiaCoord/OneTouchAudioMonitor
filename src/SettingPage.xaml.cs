@@ -4,12 +4,14 @@
  * License MIT.
  */
 
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using OneTouchMonitor.Data;
 using Windows.Foundation;
+using Windows.Media.MediaProperties;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -24,6 +26,7 @@ namespace OneTouchMonitor
         public ObservableCollection<AudioDevice> ListAudioIn { get; } = new();
         public ObservableCollection<AudioDevice> ListAudioOut { get; } = new();
         public ObservableCollection<BtDevice> ListBtOut { get; } = new();
+        public ObservableCollection<string> ListAudioQuality { get; } = new();
 
         private AudioDevice itemAudioIn = default;
         public AudioDevice ItemAudioIn {
@@ -52,6 +55,14 @@ namespace OneTouchMonitor
                 itemBtOut = value;
                 if ((value != null) && !Config.Instance.BtSelectedDevices.Contains(value))
                     Config.Instance.BtSelectedDevices.Add(value);
+                OnPropertyChanged();
+            }
+        }
+        public string ItemAudioQuality {
+            get => Config.Instance.AudioQuality.ToString();
+            set {
+                if ((value != null) && Enum.TryParse<AudioEncodingQuality>(value, out AudioEncodingQuality aq))
+                    Config.Instance.AudioQuality = aq;
                 OnPropertyChanged();
             }
         }
@@ -94,8 +105,12 @@ namespace OneTouchMonitor
                 ListAudioOut.Add(a);
             foreach (var a in Config.Instance.BtAllDevices)
                 ListBtOut.Add(a);
+            foreach (var a in Enum.GetNames(typeof(AudioEncodingQuality)))
+                if (!a.Equals(AudioEncodingQuality.Auto.ToString()))
+                    ListAudioQuality.Add(a);
 
             OnPropertyChanged(
+                nameof(ListAudioQuality),
                 nameof(ListAudioIn),
                 nameof(ListAudioOut),
                 nameof(ListBtOut));
@@ -119,6 +134,7 @@ namespace OneTouchMonitor
             ItemBtOut = default;
 
                 OnPropertyChanged(
+                    nameof(ListAudioQuality),
                     nameof(ListAudioIn),
                     nameof(ListAudioOut),
                     nameof(ListBtOut));
@@ -140,6 +156,12 @@ namespace OneTouchMonitor
             if ((sender is ComboBox cb) && (Config.Instance.BtSelectedDevices.Count > 0)) {
                 var a = DeviceFind(ListBtOut, Config.Instance.BtSelectedDevices[0].Name);
                 if (a != null) cb.SelectedIndex = ListBtOut.IndexOf(a);
+            }
+        }
+        private void ComboAudioQuality_Loaded(object sender, RoutedEventArgs _) {
+            if (sender is ComboBox cb) {
+                int idx = ListAudioQuality.IndexOf(Config.Instance.AudioQuality.ToString());
+                if (idx >= 0) cb.SelectedIndex = idx;
             }
         }
         private T1 DeviceFind<T1>(ObservableCollection<T1> list, string name) where T1 : IDevice =>

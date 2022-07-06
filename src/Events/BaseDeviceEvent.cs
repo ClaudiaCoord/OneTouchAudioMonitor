@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using OneTouchMonitor.Data;
 using OneTouchMonitor.Event;
+using OneTouchMonitor.Utils;
 using Windows.Devices.Enumeration;
 
 namespace OneTouchMonitor.Events

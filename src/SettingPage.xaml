@@ -8,11 +8,9 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     mc:Ignorable="d">
     <Page.Resources>
-        <Style x:Key="BoxList" TargetType="ComboBox">
+        <Style x:Key="StringList" TargetType="ComboBox">
             <Setter Property="Width" Value="300" />
             <Setter Property="Margin" Value="0,10,0,0" />
-            <Setter Property="DisplayMemberPath" Value="Name" />
-            <Setter Property="SelectedValuePath" Value="Name" />
         </Style>
     </Page.Resources>
 
@@ -73,6 +71,12 @@
                     Loaded="ComboBtOut_Loaded"
                     SelectedItem="{Binding ItemBtOut, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Style="{StaticResource BoxList}" />
+                <ComboBox
+                    x:Uid="GUI7"
+                    ItemsSource="{Binding ListAudioQuality, Mode=OneWay}"
+                    Loaded="ComboAudioQuality_Loaded"
+                    SelectedItem="{Binding ItemAudioQuality, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Style="{StaticResource StringList}" />
             </StackPanel>
 
             <StackPanel
@@ -81,8 +85,18 @@
                 HorizontalAlignment="Left"
                 Orientation="Horizontal"
                 Style="{StaticResource BoxPanel}">
-                <ToggleSwitch x:Uid="GUI4" IsOn="{Binding ThemeSelector, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <ToggleSwitch x:Uid="GUI6" IsOn="{Binding IsSound, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <ToggleSwitch
+                    x:Uid="GUI4"
+                    Width="110"
+                    IsOn="{Binding ThemeSelector, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <ToggleSwitch
+                    x:Uid="GUI6"
+                    Width="100"
+                    IsOn="{Binding IsSound, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <ToggleSwitch
+                    x:Uid="GUI8"
+                    Width="110"
+                    IsOn="{Binding IsMono, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </StackPanel>
         </StackPanel>
     </Grid>

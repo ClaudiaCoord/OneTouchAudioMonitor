@@ -8,11 +8,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
 using OneTouchMonitor.Data;
 using OneTouchMonitor.Event;
+using OneTouchMonitor.Utils;
 using Windows.Foundation;
 using Windows.Media;
 using Windows.System;
@@ -22,6 +23,11 @@ using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.Core.Preview;
+
+#if DEBUG
+using System.Text;
+#endif
 
 namespace OneTouchMonitor
 {
@@ -47,18 +53,37 @@ namespace OneTouchMonitor
         public MainPage() {
             this.InitializeComponent();
             DataContext = this;
+            SystemNavigationManagerPreview.GetForCurrentView().CloseRequested += this.OnCloseRequest;
         }
+        void OnCloseRequest(object sender, SystemNavigationCloseRequestedPreviewEventArgs e) {
+            AudioCaptureBackground.Instance.Dispose();
+        }
+
+        public List<double> AudioRates { get; } = new List<double>() {
+                32000,
+                44100,
+                48000,
+                88200,
+                96000,
+                176400
+            };
+        public List<double> AudioSamples { get; } = new List<double>() {
+                16,
+                24,
+                32
+            };
 
         public bool IsBTOn {
             get => isBTOn;
             set {
+                if (isBTOn == value) return;
                 isBTOn = value;
                 if (value) {
                     Config.Instance.BtSelector = AudioSelectorType.AutoPlay | AudioSelectorType.BtDevice;
                     Config.BtDevices.Start();
                     LazyStartScan(AudioSelectorType.BtDevice);
                 } else {
-                    Config.Instance.AudioSelector = AudioSelectorType.None;
+                    Config.Instance.BtSelector = AudioSelectorType.None;
                     Config.AudioCapture.Stop();
                     Config.BtDevices.Stop();
                 }
@@ -71,6 +96,7 @@ namespace OneTouchMonitor
         public bool IsAudioOn {
             get => isAudioOn;
             set {
+                if (isAudioOn == value) return;
                 isAudioOn = value;
                 if (value) {
                     Config.Instance.AudioSelector = AudioSelectorType.AutoPlay | AudioSelectorType.AudioDevice;
@@ -94,10 +120,11 @@ namespace OneTouchMonitor
         public bool IsPlayStatus => Config.Instance.IsPlay;
         public bool IsInitStatus => Config.Instance.IsInit;
         public bool IsCallSettings => !IsInitStatus && !IsPlayStatus;
+        public bool IsEffectEnable => !Config.Instance.IsInit;
         public bool IsBtOutEnable => Config.BtDevices.IsEnabled && (Config.BtDevices.IsFoundDevices || Config.BtDevices.IsConnectedDevices);
         public bool IsAudioOutEnable => Config.AudioOutDevices.IsEnabled && (Config.AudioOutDevices.IsFoundDevices || Config.AudioOutDevices.IsConnectedDevices);
         public bool IsAudioInDevice => Config.Instance.AudioInSelectedDevices.Count > 0;
-        public bool IsWarning => !IsAudioInDevice || ((Config.Instance.AudioOutSelectedDevices.Count == 0) && (Config.Instance.BtSelectedDevices.Count == 0));
+        public bool IsWarning => !IsAudioInDevice || Config.Instance.IsWarning || ((Config.Instance.AudioOutSelectedDevices.Count == 0) && (Config.Instance.BtSelectedDevices.Count == 0));
         private bool IsOldPlayStatus { get; set; } = false;
         private bool IsOldBtStatus { get; set; } = false;
         private bool IsStoryboardStart { get; set; } = false;
@@ -105,19 +132,21 @@ namespace OneTouchMonitor
         public string LogString {
             get => logString;
             set {
+                if (logString.Equals(value)) return;
                 logString = value;
-                OnPropertyChanged();
                 if (string.IsNullOrWhiteSpace(value) && IsStoryboardStart) {
                     Storyboard1.Stop(); IsStoryboardStart = false;
                 }
                 else if (!IsStoryboardStart) {
                     Storyboard1.Begin(); IsStoryboardStart = true;
                 }
+                OnPropertyChanged();
             }
         }
         public double Volume {
             get => Config.Instance.Volume;
             set {
+                if (Config.Instance.Volume == value) return;
                 Config.Instance.Volume = value + 0.0;
                 OnPropertyChanged();
             }
@@ -138,6 +167,14 @@ namespace OneTouchMonitor
             get => Config.Instance.AudioEq4;
             set { Config.Instance.AudioEq4 = value; OnPropertyChanged(); }
         }
+        public bool IsMono {
+            get => Config.Instance.IsMono;
+            set {
+                Config.Instance.IsMono = value;
+                Config.Instance.Volume = value ? Config.Instance.Volume * 1.8 : Config.Instance.Volume / 1.8;
+                OnPropertyChanged();
+            }
+        }
         public bool IsEqEnable {
             get => Config.Instance.IsEqEnable;
             set {
@@ -145,6 +182,46 @@ namespace OneTouchMonitor
                 OnPropertyChanged();
             }
         }
+        public double OutAudioRate {
+            get => (double) Config.Instance.OutAudioRate;
+            set { Config.Instance.OutAudioRate = (uint) value; OnPropertyChanged(); }
+        }
+        public double OutAudioSample {
+            get => (double) Config.Instance.OutAudioSample;
+            set { Config.Instance.OutAudioSample = (uint)value; OnPropertyChanged(); }
+        }
+        public bool IsEffectEcho {
+            get => Config.Instance.IsEffectEcho;
+            set { Config.Instance.IsEffectEcho = value; Config.AudioCapture.AddEffectEcho(); OnPropertyChanged(); }
+        }
+        public bool IsEffectLimiter {
+            get => Config.Instance.IsEffectLimiter;
+            set { Config.Instance.IsEffectLimiter = value; Config.AudioCapture.AddEffectLimiter();  OnPropertyChanged(); }
+        }
+        public double EffectDelay {
+            get => Config.Instance.EffectDelay;
+            set { Config.Instance.EffectDelay = value; OnPropertyChanged(); }
+        }
+        public double EffectFeedback {
+            get => Config.Instance.EffectFeedback;
+            set { Config.Instance.EffectFeedback = value; OnPropertyChanged(); }
+        }
+        public double EffectWetDryMix {
+            get => Config.Instance.EffectWetDryMix;
+            set { Config.Instance.EffectWetDryMix = value; OnPropertyChanged(); }
+        }
+        public double EffectLoudness {
+            get => (double) Config.Instance.EffectLoudness;
+            set { Config.Instance.EffectLoudness = (uint) value; OnPropertyChanged(); }
+        }
+
+        // IsEffectLimiter
+        // IsEffectEcho
+        // EffectLoudness
+        // EffectDelay
+        // EffectFeedback
+        // EffectWetDryMix
+
 
         #region Property Changed
         private void AllPropertyChanged(string s) {
@@ -158,6 +235,7 @@ namespace OneTouchMonitor
                 nameof(IsAudioInDevice),
                 nameof(IsAudioOutEnable),
                 nameof(IsBtOutEnable),
+                nameof(IsMono),
                 nameof(IsWarning),
                 nameof(IsRecordEnable));
             BtPropertyChanged();
@@ -186,6 +264,7 @@ namespace OneTouchMonitor
                 case DevicesEvents.Reload:
                 case DevicesEvents.Remove:
                 case DevicesEvents.RemoveAll: {
+                        MenuAudioOutDevices_Update(args.ActionId, args.Obj, MenuAudioDev, MenuAudioDevices_Run);
                         await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => AudioPropertyChanged());
                         break;
                     }
@@ -205,6 +284,76 @@ namespace OneTouchMonitor
             }
         }
 
+        private async void MenuAudioOutDevices_Update(DevicesEvents id, IDevice dev, MenuFlyout menu, Action<string> act)
+        {
+            if (IsBTOn) return;
+            switch (id)
+            {
+                case DevicesEvents.Add: {
+                        if ((dev == null) || string.IsNullOrWhiteSpace(dev.Name)) break;
+                        await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                            MenuFlyoutItemBase mfb = MenuDevices_Check(menu, dev.Name);
+                            if (mfb == default) {
+                                menu.Items.Add(new MenuFlyoutItem {
+                                    Text = dev.Name,
+                                    Command = new RelayCommand((a) => {
+                                        act.Invoke(dev.Name);
+#                                       if DEBUG
+                                        Debug.WriteLine($"Menu command: {dev.Name}");
+#                                       endif
+                                    })
+                                });
+                            }
+                        });
+                        break;
+                    }
+                case DevicesEvents.Remove: {
+                        if ((dev == null) || string.IsNullOrWhiteSpace(dev.Name)) break;
+                        await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                            MenuFlyoutItemBase mfb = MenuDevices_Check(menu, dev.Name);
+                            if (mfb != default) menu.Items.Remove(mfb);
+                        });
+                        break;
+                    }
+                case DevicesEvents.RemoveAll: {
+                        await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                            menu.Items.Clear());
+                        break;
+                    }
+            }
+        }
+
+        private MenuFlyoutItemBase MenuDevices_Check(MenuFlyout menu, string s) {
+            foreach (var m in menu.Items) {
+#               if DEBUG
+                if (m is MenuFlyoutItem mft)
+                    Debug.WriteLine($"Menu check: {s} : {mft.Text}");
+                else
+                    Debug.WriteLine($"Menu check: {s} : not-flyout-menu");
+#               endif
+                if ((m is MenuFlyoutItem mf) && mf.Text.Equals(s))
+                    return m;
+            }
+            return default;
+        }
+
+        private void MenuAudioDevices_Run(string s)
+        {
+            if (IsBTOn) return;
+            if (!string.IsNullOrWhiteSpace(s)) {
+                AudioDevice a = Config.Instance.AudioOutAllDevices.FirstOrDefault(d => d.Name == s);
+                if (a != null) {
+                    Config.Instance.AudioOutSelectedDevices.Clear();
+                    Config.Instance.AudioOutSelectedDevices.Add(a);
+                }
+                if (IsAudioOn) {
+                    Config.Instance.AudioSelector = AudioSelectorType.AutoPlay | AudioSelectorType.AudioDevice;
+                    Config.AudioOutDevices.Start();
+                } else IsAudioOn = true;
+            }
+            else if (IsAudioOn) IsAudioOn = false;
+        }
+
         private async void InPropertyChanged(object sender, PropertyChangedEventArgs e) =>
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => AllPropertyChanged(e.PropertyName));
 
@@ -217,9 +366,9 @@ namespace OneTouchMonitor
                 async (a) => {
                     await Dispatcher.RunAsync(
                         CoreDispatcherPriority.High,
-                        async () => {
+                        () => {
                             if (!IsStop)
-                                await Config.AudioCapture.Start(at).ConfigureAwait(false);
+                                Config.AudioCapture.Start(at);
                             LazyTimer = default;
                         });
                 }, TimeSpan.FromSeconds(5));
@@ -229,7 +378,6 @@ namespace OneTouchMonitor
         #region OnNavigatedTo / OnNavigatedFrom
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             RequestedTheme = Config.Instance.EleTheme;
-            mediaCtrl = SystemMediaTransportControls.GetForCurrentView();
 
             Config.Instance.PropertyChanged += InPropertyChanged;
             Config.BtDevices.EventCb += BtDevices_EventCb;
@@ -327,7 +475,7 @@ namespace OneTouchMonitor
             await ApplicationView.GetForCurrentView().TryConsolidateAsync();
 
         private async void Button_ClickPlay(object __, RoutedEventArgs _) =>
-            await Config.AudioCapture.Start().ConfigureAwait(false);
+            await Config.AudioCapture.StartAsync().ConfigureAwait(false);
 
         private async void Button_ClickStop(object __, RoutedEventArgs _) {
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
@@ -335,6 +483,16 @@ namespace OneTouchMonitor
                 Config.AudioCapture.Stop();
             });
         }
+
+        private void ComboAudioRates_Loaded(object sender, RoutedEventArgs _) {
+            if (sender is ComboBox cb)
+                cb.SelectedIndex = AudioRates.IndexOf((double)Config.Instance.OutAudioRate);
+        }
+        private void ComboAudioSamples_Loaded(object sender, RoutedEventArgs _) {
+            if (sender is ComboBox cb)
+                cb.SelectedIndex = AudioSamples.IndexOf((double)Config.Instance.OutAudioSample);
+        }
+
 
         private void ClickPlay() => Button_ClickPlay(null, null);
         private void ClickStop() => Button_ClickStop(null, null);
@@ -346,7 +504,10 @@ namespace OneTouchMonitor
 
         private async Task<bool> ClickReset() =>
             await Task.Run(async () => {
-                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => IsAudioOn = IsBTOn = false);
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                    IsOldPlayStatus = IsOldBtStatus = IsStoryboardStart =
+                    IsAudioOn = IsBTOn = false;
+                });
                 try { Config.Reset(); } catch (Exception ex) { Debug.WriteLine(ex); }
                 return true;
             });

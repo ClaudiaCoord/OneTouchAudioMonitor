@@ -132,6 +132,48 @@
   <data name="GUI1.PlaceholderText" xml:space="preserve">
     <value>Выберете устройство ..</value>
   </data>
+  <data name="GUI10.Text" xml:space="preserve">
+    <value>Настройка выходного устройства</value>
+  </data>
+  <data name="GUI11.Header" xml:space="preserve">
+    <value>частота дискретизации</value>
+  </data>
+  <data name="GUI12.Header" xml:space="preserve">
+    <value>бит на выборку</value>
+  </data>
+  <data name="GUI13.Text" xml:space="preserve">
+    <value>Звуковые эффекты</value>
+  </data>
+  <data name="GUI14.Header" xml:space="preserve">
+    <value>Ограничитель громкости</value>
+  </data>
+  <data name="GUI14.OffContent" xml:space="preserve">
+    <value>Выключен</value>
+  </data>
+  <data name="GUI14.OnContent" xml:space="preserve">
+    <value>Включен</value>
+  </data>
+  <data name="GUI15.Header" xml:space="preserve">
+    <value>Эхо эффект</value>
+  </data>
+  <data name="GUI15.OffContent" xml:space="preserve">
+    <value>Выключен</value>
+  </data>
+  <data name="GUI15.OnContent" xml:space="preserve">
+    <value>Включен</value>
+  </data>
+  <data name="GUI16.Header" xml:space="preserve">
+    <value>Уровень звука</value>
+  </data>
+  <data name="GUI17.Header" xml:space="preserve">
+    <value>Задержка</value>
+  </data>
+  <data name="GUI18.Header" xml:space="preserve">
+    <value>Возврат</value>
+  </data>
+  <data name="GUI19.Header" xml:space="preserve">
+    <value>Микс эффекта эха</value>
+  </data>
   <data name="GUI2.Header" xml:space="preserve">
     <value>Выходное устройство</value>
   </data>
@@ -145,7 +187,7 @@
     <value>Выберете устройство ..</value>
   </data>
   <data name="GUI4.Header" xml:space="preserve">
-    <value>Выбор оформления</value>
+    <value>Оформление</value>
   </data>
   <data name="GUI4.OffContent" xml:space="preserve">
     <value>Светлая</value>
@@ -167,6 +209,27 @@
   </data>
   <data name="GUI6.OnContent" xml:space="preserve">
     <value>Вкл</value>
+  </data>
+  <data name="GUI7.Header" xml:space="preserve">
+    <value>Качество записи звука</value>
+  </data>
+  <data name="GUI7.PlaceholderText" xml:space="preserve">
+    <value>Выбор качества записи</value>
+  </data>
+  <data name="GUI8.Header" xml:space="preserve">
+    <value>Выход</value>
+  </data>
+  <data name="GUI8.OffContent" xml:space="preserve">
+    <value>стерео</value>
+  </data>
+  <data name="GUI8.OnContent" xml:space="preserve">
+    <value>моно</value>
+  </data>
+  <data name="GUI9.OffContent" xml:space="preserve">
+    <value>стерео</value>
+  </data>
+  <data name="GUI9.OnContent" xml:space="preserve">
+    <value>моно</value>
   </data>
   <data name="S1" xml:space="preserve">
     <value>Остановка воспроизведения невозможна, занят другим процессом</value>

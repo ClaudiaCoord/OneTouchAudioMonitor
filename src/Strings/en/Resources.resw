@@ -132,6 +132,48 @@
   <data name="GUI1.PlaceholderText" xml:space="preserve">
     <value>Select device ..</value>
   </data>
+  <data name="GUI10.Text" xml:space="preserve">
+    <value>Setting the output Device</value>
+  </data>
+  <data name="GUI11.Header" xml:space="preserve">
+    <value>Audio rate</value>
+  </data>
+  <data name="GUI12.Header" xml:space="preserve">
+    <value>Audio bit per samples</value>
+  </data>
+  <data name="GUI13.Text" xml:space="preserve">
+    <value>Audio effects</value>
+  </data>
+  <data name="GUI14.Header" xml:space="preserve">
+    <value>Loudness limiter</value>
+  </data>
+  <data name="GUI14.OffContent" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="GUI14.OnContent" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="GUI15.Header" xml:space="preserve">
+    <value>Echo effect</value>
+  </data>
+  <data name="GUI15.OffContent" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="GUI15.OnContent" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="GUI16.Header" xml:space="preserve">
+    <value>Loudness</value>
+  </data>
+  <data name="GUI17.Header" xml:space="preserve">
+    <value>Delay</value>
+  </data>
+  <data name="GUI18.Header" xml:space="preserve">
+    <value>Feedback</value>
+  </data>
+  <data name="GUI19.Header" xml:space="preserve">
+    <value>Dry Mix</value>
+  </data>
   <data name="GUI2.Header" xml:space="preserve">
     <value>Audio Out</value>
   </data>
@@ -145,7 +187,7 @@
     <value>Select device ..</value>
   </data>
   <data name="GUI4.Header" xml:space="preserve">
-    <value>Theme select</value>
+    <value>Theme</value>
   </data>
   <data name="GUI4.OffContent" xml:space="preserve">
     <value>Light</value>
@@ -167,6 +209,27 @@
   </data>
   <data name="GUI6.OnContent" xml:space="preserve">
     <value>On</value>
+  </data>
+  <data name="GUI7.Header" xml:space="preserve">
+    <value>Record Audio quality</value>
+  </data>
+  <data name="GUI7.PlaceholderText" xml:space="preserve">
+    <value>Select encoding audio quality ..</value>
+  </data>
+  <data name="GUI8.Header" xml:space="preserve">
+    <value>Out</value>
+  </data>
+  <data name="GUI8.OffContent" xml:space="preserve">
+    <value>stereo</value>
+  </data>
+  <data name="GUI8.OnContent" xml:space="preserve">
+    <value>mono</value>
+  </data>
+  <data name="GUI9.OffContent" xml:space="preserve">
+    <value>stereo</value>
+  </data>
+  <data name="GUI9.OnContent" xml:space="preserve">
+    <value>mono</value>
   </data>
   <data name="S1" xml:space="preserve">
     <value>Cannot stop playback, busy with another process</value>

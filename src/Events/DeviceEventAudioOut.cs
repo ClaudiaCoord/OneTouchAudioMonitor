@@ -3,6 +3,7 @@
  * Copyright (c) 2022 СС
  * License MIT.
 */
+
 using System;
 using System.Threading.Tasks;
 using OneTouchMonitor.Data;

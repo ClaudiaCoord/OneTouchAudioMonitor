@@ -6,7 +6,7 @@
 using System;
 using System.Threading;
 
-namespace OneTouchMonitor
+namespace OneTouchMonitor.Utils
 {
     public class RunOnce
     {

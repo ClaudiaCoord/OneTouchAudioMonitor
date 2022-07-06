@@ -11,10 +11,12 @@ using System.Threading.Tasks;
 using OneTouchMonitor.Data;
 using OneTouchMonitor.Event;
 using OneTouchMonitor.Events;
+using OneTouchMonitor.Utils;
 using Windows.ApplicationModel.Background;
 using Windows.Media.Audio;
 using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
+using Windows.Media.Playback;
 using Windows.Media.Render;
 using Windows.Storage;
 
@@ -53,10 +55,14 @@ namespace OneTouchMonitor
         private AudioDeviceOutputNode deviceOut { get; set; }
         private AudioDeviceInputNode deviceIn { get; set; }
         private AudioFileOutputNode fileOut { get; set; } = default;
+        private AudioSubmixNode audioMix { get; set; } = default;
         private AudioDevice AudioOutDev { get; set; }
+        private LimiterEffectDefinition effectLimit { get; set; } = default;
+        private EchoEffectDefinition effectEcho { get; set; } = default;
         private RunOnce runOncePlay { get; set; } = new((b) => Config.Instance.IsPlay = b);
         private RunOnce runOnceInit { get; set; } = new((b) => Config.Instance.IsInit = b);
         private CancellationTokenSource tokenPlay { get; set; } = default(CancellationTokenSource);
+        private MediaPlayer Player { get; set; } = default;
 
         public AudioCaptureEqualizer Equalizer { get; set; } = default;
         public bool IsRecord => IsPlay && (fileOut != default);
@@ -114,6 +120,11 @@ namespace OneTouchMonitor
 
             DisposeFileRecord();
 
+            AudioSubmixNode m = audioMix;
+            audioMix = default;
+            if (m != null)
+                m.Stop();
+
             AudioDeviceInputNode i = deviceIn;
             deviceIn = null;
             if (i != null)
@@ -123,6 +134,9 @@ namespace OneTouchMonitor
             deviceOut = null;
             if (o != null)
                 o.Stop();
+
+            if (m != null)
+                m.Dispose();
 
             if (i != null)
                 i.Dispose();
@@ -174,7 +188,11 @@ namespace OneTouchMonitor
         }
 
         #region Start/Stop Play
-        public async Task<bool> Start() =>
+        public async void Start() => await StartAsync().ConfigureAwait(false);
+        public async void Start(AudioSelectorType at) => await StartAsync(at).ConfigureAwait(false);
+        public async void Start(AudioDevice dev) => await StartAsync(dev).ConfigureAwait(false);
+
+        public async Task<bool> StartAsync() =>
             await Task.Run(async () => {
 
                 if (IsPlay || !runOnceInit.Begin()) {
@@ -190,6 +208,10 @@ namespace OneTouchMonitor
 
                     DisposeTokenPlay();
                     tokenPlay = new();
+                    Config.Instance.IsWarning = false;
+
+                    if (Player == null)
+                        Player = AudioCaptureBackground.Instance.Player;
 
                     AudioDevice dev = default;
                     CancellationToken t = tokenPlay.Token;
@@ -214,14 +236,14 @@ namespace OneTouchMonitor
                         return false;
                     }
                     if (t.IsCancellationRequested) return false;
-                    return await Start(dev).ConfigureAwait(false);
+                    return await StartAsync(dev).ConfigureAwait(false);
                 }
-                catch (Exception ex) { ToLog(this, ex); }
+                catch (Exception ex) { ToLog(this, ex); Config.Instance.IsWarning = true; }
                 finally { runOnceInit.End(); }
                 return false;
             });
 
-        public async Task<bool> Start(AudioSelectorType at) =>
+        public async Task<bool> StartAsync(AudioSelectorType at) =>
             await Task.Run(async () => {
 
                 if (IsPlay || !runOnceInit.Begin()) {
@@ -237,6 +259,10 @@ namespace OneTouchMonitor
 
                     DisposeTokenPlay();
                     tokenPlay = new();
+                    Config.Instance.IsWarning = false;
+
+                    if (Player == null)
+                        Player = AudioCaptureBackground.Instance.Player;
 
                     AudioDevice dev = default;
                     CancellationToken t = tokenPlay.Token;
@@ -266,18 +292,21 @@ namespace OneTouchMonitor
                         return false;
                     }
                     if (t.IsCancellationRequested) return false;
-                    return await Start(dev).ConfigureAwait(false);
+                    return await StartAsync(dev).ConfigureAwait(false);
                 }
-                catch (Exception ex) { ToLog(this, ex); }
+                catch (Exception ex) { ToLog(this, ex); Config.Instance.IsWarning = true; }
                 finally { runOnceInit.End(); }
                 return false;
             });
 
-        public async Task<bool> Start(AudioDevice dev) =>
+        public async Task<bool> StartAsync(AudioDevice dev) =>
             await Task.Run(async () => {
 
                 if ((dev == default) || !runOncePlay.Begin()) {
-                    ToLog(this, $"{Config.GetString("S4")} -> {IsPlay}/{dev.IsEmpty}/{dev.IsPlay}");
+                    if (dev == default)
+                        ToLog(this, $"{Config.GetString("S4")} -> {IsPlay}/null");
+                    else
+                        ToLog(this, $"{Config.GetString("S4")} -> {IsPlay}/{dev.IsEmpty}/{dev.IsPlay}");
                     return false;
                 }
 
@@ -285,6 +314,7 @@ namespace OneTouchMonitor
                 try {
 
                     DisposeTokenPlay();
+                    Config.Instance.IsWarning = false;
 
                     AudioDevice AudioInDev = IsAudioInDeviceFound();
                     if (AudioInDev == default) {
@@ -293,6 +323,9 @@ namespace OneTouchMonitor
                     }
 
                     tokenPlay = new();
+
+                    if (Player == null)
+                        Player = AudioCaptureBackground.Instance.Player;
 
                     AudioOutDev = dev;
                     AudioOutDev.IsPlay = true;
@@ -315,9 +348,8 @@ namespace OneTouchMonitor
 
                     var inputResult = await audioGraph.CreateDeviceInputNodeAsync(
                         MediaCategory.GameChat,
-                        MediaEncodingProfile.CreateWav(
-                            Config.Instance.IsMono ? AudioEncodingQuality.Low : AudioEncodingQuality.Medium).Audio,
-                            AudioInDev.Device);
+                        AudioEncodingProperties.CreatePcm(Config.Instance.OutAudioRate, Config.Instance.IsMono ? 1U : 2U, Config.Instance.OutAudioSample),
+                        AudioInDev.Device);
                     if (inputResult.Status != AudioDeviceNodeCreationStatus.Success)
                         return false;
 
@@ -336,7 +368,13 @@ namespace OneTouchMonitor
                     Equalizer.AudioEq3 = eq3val;
                     Equalizer.AudioEq4 = eq4val;
 
-                    deviceIn.AddOutgoingConnection(deviceOut);
+                    audioMix = audioGraph.CreateSubmixNode();
+                    deviceIn.AddOutgoingConnection(audioMix);
+                    audioMix.AddOutgoingConnection(deviceOut);
+
+                    AddEffectLimiter();
+                    AddEffectEcho();
+
                     audioGraph.Start();
                     if (IsEqEnable) Equalizer.On(deviceOut);
                     else Equalizer.Off(deviceOut);
@@ -347,6 +385,7 @@ namespace OneTouchMonitor
                 catch (Exception ex) {
                     ToLog(this, ex);
                     isinit = false;
+                    Config.Instance.IsWarning = true;
                 }
                 finally {
                     
@@ -363,44 +402,32 @@ namespace OneTouchMonitor
                 return false;
             });
 
-        /*
-        private void AudioGraph_QuantumProcessed(AudioGraph sender, object args) {
-            using (AudioBuffer buffer = deviceOut.GetFrame().LockBuffer(AudioBufferAccessMode.Write))
-            using (IMemoryBufferReference reference = buffer.CreateReference())
-            {
-                byte* dataInBytes;
-                uint capacityInBytes;
-                float* dataInFloat;
+        public async void Stop() => await StopAsync().ConfigureAwait(false);
+        public async Task<bool> StopAsync() =>
+            await Task<bool>.Run(async () => {
+                if (!IsPlay) return false;
 
-                // Get the buffer from the AudioFrame
-                ((IMemoryBufferByteAccess)reference).GetBuffer(out dataInBytes, out capacityInBytes);
-
-                dataInFloat = (float*)dataInBytes;
-
-
-            }
-            dataInFloat = (float*)dataInBytes;
-            float max = 0;
-            for (int i = 0; i < sender.SamplesPerQuantum; i++)
-            {
-                max = Math.Max(Math.Abs(dataInFloat[i]), max);
-
-            }
-
-            finalLevel = max;
-            Debug.WriteLine(max);
-        }
-        */
-
-        public void Stop() {
-            if (!IsPlay || !runOnceInit.Begin()) {
-                ToLog(this, $"{Config.GetString("S1")} -> {IsPlay}/{IsInit}/{runOnceInit.UsingCount}");
-                return;
-            }
-            try { Dispose(); }
-            catch (Exception ex) { ToLog(this, ex); }
-            finally { runOnceInit.End(); }
-        }
+                try {
+                    if ((tokenPlay != null) && !tokenPlay.IsCancellationRequested)
+                        tokenPlay.Cancel();
+                    CancellationTokenSource token = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+                    while (runOnceInit.IsRun) {
+                        if (token.IsCancellationRequested) break;
+                        await Task.Delay(100).ConfigureAwait(false);
+                    }
+                    if (runOnceInit.IsRun) {
+                        ToLog(this, $"{Config.GetString("S1")} -> {IsPlay}/{IsInit}/{runOnceInit.UsingCount}");
+                        Config.Instance.IsWarning = true;
+                        return false;
+                    }
+                    Dispose();
+                    Config.Instance.IsWarning = false;
+                    return true;
+                }
+                catch (Exception ex) { ToLog(this, ex); }
+                finally { runOnceInit.End(); }
+                return false;
+            });
         #endregion
 
         #region Start/Stop Record
@@ -420,7 +447,7 @@ namespace OneTouchMonitor
                     if (file == default) return false;
 
                     var fileResult = await audioGraph.CreateFileOutputNodeAsync(
-                        file, MediaEncodingProfile.CreateMp3(AudioEncodingQuality.Medium));
+                        file, MediaEncodingProfile.CreateMp3(Config.Instance.AudioQuality));
                     if (fileResult.Status != AudioFileNodeCreationStatus.Success) return false;
 
                     fileOut = fileResult.FileOutputNode;
@@ -433,7 +460,7 @@ namespace OneTouchMonitor
                         return true;
                     }
                 }
-                catch (Exception ex) { ToLog(this, ex); }
+                catch (Exception ex) { ToLog(this, ex); Config.Instance.IsWarning = true; }
                 return false;
             });
 
@@ -441,10 +468,47 @@ namespace OneTouchMonitor
             try {
                 if (!IsRecord || (fileOut == default)) return false;
                 DisposeFileRecord();
+                Config.Instance.IsWarning = false;
                 return true;
             }
-            catch (Exception ex) { ToLog(this, ex); }
+            catch (Exception ex) { ToLog(this, ex); Config.Instance.IsWarning = true; }
             return false;
+        }
+
+        public void AddEffectLimiter() {
+            if ((audioMix == default) || (audioGraph == default)) return;
+            try {
+                if (Config.Instance.IsEffectLimiter) {
+                    if (effectLimit == default)
+                        effectLimit = new LimiterEffectDefinition(audioGraph);
+                    effectLimit.Loudness = Config.Instance.EffectLoudness;
+                    audioMix.EffectDefinitions.Add(effectLimit);
+                } else if (effectLimit != default) {
+                    audioMix.EffectDefinitions.Remove(effectLimit);
+                }
+            }
+            catch (Exception ex) {
+                ToLog(this, ex);
+                Config.Instance.IsWarning = true;
+            }
+        }
+        public void AddEffectEcho() {
+            if ((audioMix == default) || (audioGraph == default)) return;
+            try {
+                if (Config.Instance.IsEffectEcho) {
+                    if (effectEcho == default)
+                        effectEcho = new EchoEffectDefinition(audioGraph);
+                    effectEcho.Delay = Config.Instance.EffectDelay;
+                    effectEcho.Feedback = Config.Instance.EffectFeedback;
+                    effectEcho.WetDryMix = Config.Instance.EffectWetDryMix;
+                    audioMix.EffectDefinitions.Add(effectEcho);
+                } else if (effectEcho != default) {
+                    audioMix.EffectDefinitions.Remove(effectEcho);
+                }
+            } catch (Exception ex) {
+                ToLog(this, ex);
+                Config.Instance.IsWarning = true;
+            }
         }
         #endregion
 
@@ -464,7 +528,7 @@ namespace OneTouchMonitor
                     cts.Dispose();
                     if ((dev != default) && !dev.IsEmpty && !IsPlay) {
                         ToLog(this, string.Format(Config.GetString("FMT2"), typeof(T).Name, d.Name));
-                        await Start(dev).ConfigureAwait(false);
+                        await StartAsync(dev).ConfigureAwait(false);
                     }
                 } catch { }
                 finally { runOnceInit.UnUsing(); }
@@ -523,6 +587,26 @@ namespace OneTouchMonitor
         private void Config_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
             switch (e.PropertyName) {
                 case nameof(Configuration.Volume): Volume = Config.Instance.Volume; break;
+                case nameof(Configuration.EffectLoudness): {
+                        if (effectLimit != default)
+                            effectLimit.Loudness = Config.Instance.EffectLoudness;
+                        break;
+                    }
+                case nameof(Configuration.EffectDelay): {
+                        if (effectEcho != default)
+                            effectEcho.Delay = Config.Instance.EffectDelay;
+                        break;
+                    }
+                case nameof(Configuration.EffectFeedback): {
+                        if (effectEcho != default)
+                            effectEcho.Feedback = Config.Instance.EffectFeedback;
+                        break;
+                    }
+                case nameof(Configuration.EffectWetDryMix): {
+                        if (effectEcho != default)
+                            effectEcho.WetDryMix = Config.Instance.EffectWetDryMix;
+                        break;
+                    }
             }
         }
         private async void EventsCb<T1>(object obj, BaseEventArgs<T1> args) where T1 : IDevice, new()
@@ -538,12 +622,12 @@ namespace OneTouchMonitor
                             if (((type == AudioSelectorType.AudioDevice) && AudioOutDev.CompareAudioName(data.Name)) ||
                                 ((type == AudioSelectorType.BtDevice) && AudioOutDev.CompareBTName(data.Name))) {
                                 ToLog(this, string.Format(Config.GetString("FMT1"), type.ToString(), DevicesEvents.Remove.ToString(), data.Name));
-                                Stop();
+                                await StopAsync().ConfigureAwait(false);
                             }
                         }
                         else if ((type == AudioSelectorType.BtDevice) && (args.ActionId == DevicesEvents.RemoveAll)) {
                             ToLog(this, string.Format(Config.GetString("FMT4"), DevicesEvents.RemoveAll.ToString()));
-                            Stop();
+                            await StopAsync().ConfigureAwait(false);
                         }
                     }
                 } else {
@@ -554,7 +638,7 @@ namespace OneTouchMonitor
                                 await FindDevice(data).ConfigureAwait(false);
                         }
                         else if ((args.ActionId == DevicesEvents.Enable) || (args.ActionId == DevicesEvents.Reload))
-                            await Start(type).ConfigureAwait(false);
+                            await StartAsync(type).ConfigureAwait(false);
                     }
                 }
             } catch (Exception ex) { ToLog(this, ex); }
@@ -564,24 +648,55 @@ namespace OneTouchMonitor
         private void BtDevices_EventCb(object obj, BaseEventArgs<BtDevice> args) =>
             EventsCb(obj, args);
 
-        private void AudioInDevices_EventCb(object obj, BaseEventArgs<AudioDevice> args)
-        {
-            if (IsPlay)
-            {
+        private async void AudioInDevices_EventCb(object obj, BaseEventArgs<AudioDevice> args) {
+
+            if (IsPlay) {
                 if ((args.ActionId == DevicesEvents.Remove) && (AudioOutDev != default)) {
                     if (args.Obj is AudioDevice data) {
                         if (AudioOutDev.CompareAudioName(data.Name)) {
                             ToLog(this, string.Format(Config.GetString("FMT1"), nameof(AudioDevice), DevicesEvents.Remove.ToString(), data.Name));
-                            Stop();
+                            await StopAsync().ConfigureAwait(false);
                         }
                     }
                     else if (args.ActionId == DevicesEvents.RemoveAll) {
                         ToLog(this, string.Format(Config.GetString("FMT4"), DevicesEvents.RemoveAll.ToString()));
-                        Stop();
+                        await StopAsync().ConfigureAwait(false);
                     }
                 }
             }
         }
         #endregion
+
+
+        /*
+        private void AudioGraph_QuantumProcessed(AudioGraph sender, object args) {
+            using (AudioBuffer buffer = deviceOut.GetFrame().LockBuffer(AudioBufferAccessMode.Write))
+            using (IMemoryBufferReference reference = buffer.CreateReference())
+            {
+                byte* dataInBytes;
+                uint capacityInBytes;
+                float* dataInFloat;
+
+                // Get the buffer from the AudioFrame
+                ((IMemoryBufferByteAccess)reference).GetBuffer(out dataInBytes, out capacityInBytes);
+
+                dataInFloat = (float*)dataInBytes;
+
+
+            }
+            dataInFloat = (float*)dataInBytes;
+            float max = 0;
+            for (int i = 0; i < sender.SamplesPerQuantum; i++)
+            {
+                max = Math.Max(Math.Abs(dataInFloat[i]), max);
+
+            }
+
+            finalLevel = max;
+            Debug.WriteLine(max);
+        }
+        */
+
+
     }
 }

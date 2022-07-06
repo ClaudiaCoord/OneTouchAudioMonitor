@@ -2,7 +2,8 @@
  * Git: https://github.com/ClaudiaCoord/OneTouchAudioMonitor
  * Copyright (c) 2022 СС
  * License MIT.
-*/
+ */
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using OneTouchMonitor.Events;
+using Windows.Media.MediaProperties;
 using Windows.UI.Xaml;
 using RES = Windows.ApplicationModel.Resources;
 
@@ -25,11 +27,21 @@ namespace OneTouchMonitor.Data
     public class Configuration : INotifyPropertyChanged
     {
         private double volume = 0.8;
+        private uint audiorate = 48000,
+                     audiosamples = 16,
+                     effectloudness = 1000;
         private bool ismono = false,
-                     issound = false;
+                     issound = false,
+                     iswarning = false,
+                     isaudioecho = false,
+                     isaudiolimiter = false;
+        private double effectdelay = 1000.0,
+                       effectfeedback = 0.2,
+                       effectwetdrymix = 0.5;
         private ApplicationTheme theme = ApplicationTheme.Dark;
         private AudioSelectorType btSelector = AudioSelectorType.None;
         private AudioSelectorType audioSelector = AudioSelectorType.None;
+        private AudioEncodingQuality audioQuality = AudioEncodingQuality.Medium;
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string name = "") =>
@@ -159,10 +171,41 @@ namespace OneTouchMonitor.Data
             get => ismono;
             set { ismono = value; OnPropertyChanged(); }
         }
-        public bool IsSound
-        {
+        public bool IsSound {
             get => issound;
             set { issound = value; OnPropertyChanged(); }
+        }
+        public bool IsEffectEcho {
+            get => isaudioecho;
+            set { isaudioecho = value; OnPropertyChanged(); }
+        }
+        public bool IsEffectLimiter {
+            get => isaudiolimiter;
+            set { isaudiolimiter = value; OnPropertyChanged(); }
+        }
+        public double EffectDelay {
+            get => effectdelay;
+            set { effectdelay = value; OnPropertyChanged(); }
+        }
+        public double EffectFeedback {
+            get => effectfeedback;
+            set { effectfeedback = value; OnPropertyChanged(); }
+        }
+        public double EffectWetDryMix {
+            get => effectwetdrymix;
+            set { effectwetdrymix = value; OnPropertyChanged(); }
+        }
+        public uint EffectLoudness {
+            get => effectloudness;
+            set { effectloudness = value; OnPropertyChanged(); }
+        }
+        public uint OutAudioRate {
+            get => audiorate;
+            set { audiorate = value; OnPropertyChanged(); }
+        }
+        public uint OutAudioSample {
+            get => audiosamples;
+            set { audiosamples = value; OnPropertyChanged(); }
         }
         [XmlIgnore]
         public bool IsPlay {
@@ -180,12 +223,21 @@ namespace OneTouchMonitor.Data
             set => OnPropertyChanged();
         }
         [XmlIgnore]
+        public bool IsWarning {
+            get => iswarning;
+            set { if (iswarning != value) iswarning = value; OnPropertyChanged(); }
+        }
+        [XmlIgnore]
         public ElementTheme EleTheme {
             get => (theme == ApplicationTheme.Dark) ? ElementTheme.Dark : ElementTheme.Light;
         }
         public ApplicationTheme Theme {
             get => theme;
             set { theme = value; OnPropertyChanged(); }
+        }
+        public AudioEncodingQuality AudioQuality {
+            get => audioQuality;
+            set { audioQuality = value; OnPropertyChanged(); }
         }
 
         public void BtOutDevicesAdd(List<BtDevice> list) { BtAwailDevices.Clear();  BtAwailDevices.AddRange(list); }
@@ -247,7 +299,7 @@ namespace OneTouchMonitor.Data
             await AudioCapture.AutoInit().ConfigureAwait(false);
         }
 
-        public static void Reset() {
+        public static async void Reset(Action act = default) {
 
             AudioCapture.Stop();
             AudioInDevices.Stop();
@@ -265,6 +317,9 @@ namespace OneTouchMonitor.Data
             AudioOutDevices.Dispose();
             BtDevices.Dispose();
 
+            if (act != default)
+                act.Invoke();
+
             Task.Delay(250).Wait();
 
             AudioInDevices = new();
@@ -272,7 +327,7 @@ namespace OneTouchMonitor.Data
             AudioCapture = new();
             BtDevices = new();
 
-            Init();
+            await Load().ContinueWith((a) => Init()).ConfigureAwait(false);
         }
 
         public static async Task Save() =>
