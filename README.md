@@ -39,6 +39,6 @@ Check the windows start menu, there should be a shortcut named `OneTouch Monitor
 
 ### Interfaces screens:
 
-![OneTouch Audio Monitor](docs/img1.png) 
+![OneTouch Audio Monitor](docs/img1-0.png) 
 
 Windows UWP software, support platform: `x86`,`x64`,`ARM`,`ARM64`
